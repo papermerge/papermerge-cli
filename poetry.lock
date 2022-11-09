@@ -35,7 +35,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "papermerge-restapi-client"
-version = "1.0.1"
+version = "1.0.2"
 description = "Papermerge REST API"
 category = "main"
 optional = false
@@ -126,7 +126,7 @@ frozendict = [
     {file = "frozendict-2.3.4.tar.gz", hash = "sha256:15b4b18346259392b0d27598f240e9390fafbff882137a9c48a1e0104fb17f78"},
 ]
 papermerge-restapi-client = [
-    {file = "papermerge-restapi-client-1.0.1.tar.gz", hash = "sha256:74fb8e3a6a85d76a6fdf9cab58166d64c104734cfb298d4c6b9748193957bbfc"},
+    {file = "papermerge-restapi-client-1.0.2.tar.gz", hash = "sha256:0ab9b0562b915c5e10ffac3997aae8f5dbf564fd3c87f7f8d5aa7779f5cc65b8"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
