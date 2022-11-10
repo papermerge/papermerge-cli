@@ -24,7 +24,13 @@ def perform_auth(host, username, password):
     return api_response.body['token']
 
 
-def perform_list(host, token, parent_uuid=None):
+def perform_list(
+    host,
+    token,
+    parent_uuid=None,
+    page_number=1,
+    page_size=15
+):
     configuration = papermerge_restapi_client.Configuration(host=host)
     configuration.api_key['Token Authentication'] = f'Token {token}'
 
@@ -40,14 +46,10 @@ def perform_list(host, token, parent_uuid=None):
         response.body['data']['relationships']['home_folder']['data']['id']
     inbox_folder_uuid = \
         response.body['data']['relationships']['inbox_folder']['data']['id']
-    click.echo(f'user_uuid={user_uuid}')
-    click.echo(f'home folder uuid={home_folder_uuid}')
-    click.echo(f'inbox folder uuid={inbox_folder_uuid}')
-
 
     with papermerge_restapi_client.ApiClient(configuration) as api_client:
         # Create an instance of the API class
-        api_instance = nodes_api.NodesApi(api_client)
+        nodes_api_instance = nodes_api.NodesApi(api_client)
 
     if parent_uuid is None:
         path_params = {
@@ -58,6 +60,52 @@ def perform_list(host, token, parent_uuid=None):
             'id': parent_uuid
         }
 
-    response = api_instance.retrieve_node(path_params=path_params)
+    query_params = {
+        'page[number]': page_number,
+        'page[size]': page_size
+    }
 
-    click.echo(response)
+    response = nodes_api_instance.node_retrieve(
+        path_params=path_params,
+        query_params=query_params
+    )
+
+    page = response.body['meta']['pagination']['page']
+    pages = response.body['meta']['pagination']['pages']
+    count = response.body['meta']['pagination']['count']
+    click.echo(f"Page={page} of {pages}. Total nodes={count}")
+
+    for node in response.body['data']:
+        type_letter = 'd' if node['type'] == 'Document' else 'f'
+        title = node['attributes']['title']
+        uuid = node['id']
+        click.echo(f"{type_letter} {title} {uuid}")
+
+
+def perform_me(
+    host,
+    token
+):
+    configuration = papermerge_restapi_client.Configuration(host=host)
+    configuration.api_key['Token Authentication'] = f'Token {token}'
+
+    # Enter a context with an instance of the API client
+    with papermerge_restapi_client.ApiClient(configuration) as api_client:
+        # Create an instance of the API class
+        api_instance = users_api.UsersApi(api_client)
+
+    response = api_instance.users_me_retrieve()
+
+    user_uuid = response.body['data']['id']
+    username = response.body['data']['attributes']['username']
+    email = response.body['data']['attributes']['email']
+    home_folder_uuid = \
+        response.body['data']['relationships']['home_folder']['data']['id']
+    inbox_folder_uuid = \
+        response.body['data']['relationships']['inbox_folder']['data']['id']
+
+    click.echo(f'user_uuid={user_uuid}')
+    click.echo(f'username={username}')
+    click.echo(f'email={email}')
+    click.echo(f'home folder uuid={home_folder_uuid}')
+    click.echo(f'inbox folder uuid={inbox_folder_uuid}')
