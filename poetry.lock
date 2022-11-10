@@ -35,11 +35,12 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "papermerge-restapi-client"
-version = "1.0.2"
+version = "1.0.4"
 description = "Papermerge REST API"
 category = "main"
 optional = false
 python-versions = ">=3.7"
+develop = false
 
 [package.dependencies]
 certifi = "*"
@@ -47,6 +48,10 @@ frozendict = ">=2.0.3"
 python-dateutil = "*"
 typing_extensions = "*"
 urllib3 = ">=1.15"
+
+[package.source]
+type = "directory"
+url = "../RestAPIClients/generated-rest-api-client-python"
 
 [[package]]
 name = "python-dateutil"
@@ -91,7 +96,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "e4bd1a8cb07e1f900af608517e7274342936c5e7c29845c825142c2a347aee67"
+content-hash = "cd29acc55bf31869b9104e835c4b8c6688291900760f8eec1b4fce74925beec9"
 
 [metadata.files]
 certifi = [
@@ -125,9 +130,7 @@ frozendict = [
     {file = "frozendict-2.3.4-py3-none-any.whl", hash = "sha256:d722f3d89db6ae35ef35ecc243c40c800eb344848c83dba4798353312cd37b15"},
     {file = "frozendict-2.3.4.tar.gz", hash = "sha256:15b4b18346259392b0d27598f240e9390fafbff882137a9c48a1e0104fb17f78"},
 ]
-papermerge-restapi-client = [
-    {file = "papermerge-restapi-client-1.0.2.tar.gz", hash = "sha256:0ab9b0562b915c5e10ffac3997aae8f5dbf564fd3c87f7f8d5aa7779f5cc65b8"},
-]
+papermerge-restapi-client = []
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},

@@ -1,7 +1,7 @@
 import os
 import click
 
-from .rest import perform_auth, perform_list
+from .rest import perform_auth, perform_list, perform_me
 
 PREFIX = 'PAPERMERGE_CLI'
 
@@ -44,6 +44,7 @@ def cli(ctx, host, token):
 )
 @click.pass_context
 def auth(ctx, username, password):
+    """Authenticate with username and password"""
     token = perform_auth(
         host=ctx.obj['HOST'],
         username=username,
@@ -54,6 +55,7 @@ def auth(ctx, username, password):
 
 @click.command(name="import")
 def _import():
+    """Import documents from local folder"""
     click.echo('import')
 
 
@@ -62,14 +64,45 @@ def _import():
     '--parent-uuid',
     help='Parent folder UUID'
 )
+@click.option(
+    '--page-number',
+    help='Page number to list',
+    default=1
+)
+@click.option(
+    '--page-size',
+    help='Page size',
+    default=15
+)
 @click.pass_context
-def _list(ctx, parent_uuid):
+def _list(ctx, parent_uuid, page_number, page_size):
     """Lists documents and folders"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    perform_list(host=host, token=token, parent_uuid=parent_uuid)
+    perform_list(
+        host=host,
+        token=token,
+        parent_uuid=parent_uuid,
+        page_number=page_number,
+        page_size=page_size
+    )
+
+
+@click.command(name="me")
+@click.pass_context
+def current_user(
+    ctx
+):
+    """Show details of current user"""
+    token = ctx.obj['TOKEN']
+    host = ctx.obj['HOST']
+    perform_me(
+        host=host,
+        token=token,
+    )
 
 
 cli.add_command(auth)
 cli.add_command(_import)
 cli.add_command(_list)
+cli.add_command(current_user)
