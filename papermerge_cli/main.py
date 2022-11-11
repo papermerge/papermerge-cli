@@ -1,7 +1,12 @@
 import os
 import click
 
-from .rest import perform_auth, perform_list, perform_me
+from .rest import (
+    perform_auth,
+    perform_list,
+    perform_me,
+    perform_import
+)
 
 PREFIX = 'PAPERMERGE_CLI'
 
@@ -54,9 +59,19 @@ def auth(ctx, username, password):
 
 
 @click.command(name="import")
-def _import():
+@click.argument('file_or_folder')
+@click.pass_context
+def _import(ctx, file_or_folder):
     """Import documents from local folder"""
-    click.echo('import')
+
+    host=ctx.obj['HOST']
+    token = ctx.obj['TOKEN']
+
+    perform_import(
+        host=host,
+        token=token,
+        file_or_folder=file_or_folder
+    )
 
 
 @click.command(name="list")
