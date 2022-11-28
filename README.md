@@ -38,3 +38,20 @@ In order to list content of specific folder (including inbox folder):
 In order to see current user details (current user UUID, home folder UUID, inbox folder UUID, username etc):
 
     $ papermerge-cli me
+
+
+List all preferences:
+
+    $ papermerge-cli pref-list
+
+List specific section of the preferences
+
+    $ preferences-cli pref-list --section=ocr
+
+Show value of preference `trigger` from section `ocr`:
+
+    $ preferences-cli pref-list --section=ocr --name=trigger
+
+Update value of the preference `trigger` from section `ocr`:
+
+    $ preferences-cli pref-update --section=ocr --name=trigger --value=auto

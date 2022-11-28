@@ -241,3 +241,11 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
                 file_or_folder=entry.path,
                 parent_uuid=folder_uuid
             )
+
+
+def perform_pref_list(host: str, token: str) -> None:
+    pass
+
+
+def perform_pref_update(host: str, token: str) -> None:
+    pass
