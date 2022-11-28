@@ -27,6 +27,35 @@ def get_user_home_uuid(restapi_client):
     return ret
 
 
+def create_folder(
+        restapi_client,
+        parent_uuid: str,
+        title: str
+) -> str:
+    nodes_api_instance = nodes_api.NodesCreate(restapi_client)
+
+    body = dict(
+        data=dict(
+            type="folders",
+            attributes=dict(
+                title=title,
+            ),
+            relationships=dict(
+                parent=dict(
+                    data=dict(
+                        type="folders",
+                        id=parent_uuid,
+                    ),
+                ),
+            ),
+        ),
+    )
+    response = nodes_api_instance.nodes_create(body=body)
+    folder_uuid = response.body['data']['id']
+
+    return folder_uuid
+
+
 def upload_document(restapi_client, parent_uuid, file_path):
     nodes_api_instance = nodes_api.NodesCreate(restapi_client)
     title = os.path.basename(file_path)
@@ -58,9 +87,14 @@ def upload_document(restapi_client, parent_uuid, file_path):
         'file_name': title,
         'document_id': document_uuid
     }
+    header_params = {
+        'Content-Disposition': f'attachment; filename={title}'
+    }
     documents_api_instance.upload_file(
         body=body,
-        path_params=path_params
+        path_params=path_params,
+        header_params=header_params,
+        skip_deserialization=True
     )
 
 
@@ -167,27 +201,43 @@ def perform_me(
     click.echo(f'inbox folder uuid={inbox_folder_uuid}')
 
 
-def perform_import(host, token, file_or_folder):
-
+def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None) -> None:
+    """Performs recursive import of given path"""
     restapi_client = get_restapi_client(host, token)
-    home_uuid = get_user_home_uuid(restapi_client)
+    if parent_uuid is None:
+        parent_uuid = get_user_home_uuid(restapi_client)
 
     if os.path.isfile(file_or_folder):
-        click.echo(f"Importing {file_or_folder}...")
+        # if file_or_folder is a path to document (i.e. file),then just
+        # upload that document and we are done!
+        click.echo(f"Importing {file_or_folder}")
         upload_document(
             restapi_client=restapi_client,
-            parent_uuid=home_uuid,
+            parent_uuid=parent_uuid,
             file_path=file_or_folder
         )
         return
 
+    # If we are here, this means that file_or_folder is actually a path to
+    # folder
     for entry in os.scandir(file_or_folder):
         if entry.is_file():
-            click.echo(f"Importing {entry.path}...")
+            click.echo(f"Importing {entry.path}")
             upload_document(
                 restapi_client=restapi_client,
-                parent_uuid=home_uuid,
+                parent_uuid=parent_uuid,
                 file_path=entry.path
             )
         else:
-            click.echo(f"Skipping {entry.path} as it is not a file")
+            folder_title = os.path.basename(entry.path)
+            folder_uuid = create_folder(
+                restapi_client,
+                parent_uuid=parent_uuid,
+                title=folder_title,
+            )
+            perform_import(
+                host=host,
+                token=token,
+                file_or_folder=entry.path,
+                parent_uuid=folder_uuid
+            )
