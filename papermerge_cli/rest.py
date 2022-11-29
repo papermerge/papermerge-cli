@@ -6,7 +6,8 @@ from papermerge_restapi_client.apis.tags import (
     auth_api,
     users_api,
     nodes_api,
-    documents_api
+    documents_api,
+    preferences_api
 )
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
@@ -244,7 +245,10 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
 
 
 def perform_pref_list(host: str, token: str) -> None:
-    pass
+    restapi_client = get_restapi_client(host, token)
+    api_instance = preferences_api.PreferencesApi(restapi_client)
+    response = api_instance.preferences_list()
+    click.echo(response)
 
 
 def perform_pref_update(host: str, token: str) -> None:

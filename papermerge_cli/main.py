@@ -119,6 +119,7 @@ def current_user(
     )
 
 
+@click.command
 @click.pass_context
 def pref_list(
     ctx
@@ -132,6 +133,7 @@ def pref_list(
     )
 
 
+@click.command
 @click.pass_context
 def pref_update(
     ctx
