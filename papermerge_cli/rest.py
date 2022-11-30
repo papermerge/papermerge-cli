@@ -6,7 +6,8 @@ from papermerge_restapi_client.apis.tags import (
     auth_api,
     users_api,
     nodes_api,
-    documents_api
+    documents_api,
+    preferences_api
 )
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
@@ -241,3 +242,27 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
                 file_or_folder=entry.path,
                 parent_uuid=folder_uuid
             )
+
+
+def perform_pref_list(
+    host: str,
+    token: str,
+    section: str | None = None,
+    name: str | None = None
+) -> None:
+    """Shows preferences of the user identified by token"""
+    restapi_client = get_restapi_client(host, token)
+    api_instance = preferences_api.PreferencesApi(restapi_client)
+    response = api_instance.preferences_list()
+
+    for item in response.body['data']:
+        pref = item['attributes']
+        _sec = pref['section']
+        _name = pref['name']
+        value = pref['value']
+        if (section is None or section == _sec) and (name is None or _name == name):
+            click.echo(f"section={_sec} name={_name} value={value}")
+
+
+def perform_pref_update(host: str, token: str) -> None:
+    pass
