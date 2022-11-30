@@ -244,7 +244,12 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
             )
 
 
-def perform_pref_list(host: str, token: str, section, name) -> None:
+def perform_pref_list(
+    host: str,
+    token: str,
+    section: str | None = None,
+    name: str | None = None
+) -> None:
     restapi_client = get_restapi_client(host, token)
     api_instance = preferences_api.PreferencesApi(restapi_client)
     response = api_instance.preferences_list()
