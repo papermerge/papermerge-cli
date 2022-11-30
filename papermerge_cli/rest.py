@@ -244,11 +244,18 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
             )
 
 
-def perform_pref_list(host: str, token: str) -> None:
+def perform_pref_list(host: str, token: str, section, name) -> None:
     restapi_client = get_restapi_client(host, token)
     api_instance = preferences_api.PreferencesApi(restapi_client)
     response = api_instance.preferences_list()
-    click.echo(response)
+
+    for item in response.body['data']:
+        pref = item['attributes']
+        _sec = pref['section']
+        _name = pref['name']
+        value = pref['value']
+        if (section is None or section == _sec) and (name is None or _name == name):
+            click.echo(f"section={_sec} name={_name} value={value}")
 
 
 def perform_pref_update(host: str, token: str) -> None:

@@ -46,12 +46,12 @@ List all preferences:
 
 List specific section of the preferences
 
-    $ preferences-cli pref-list --section=ocr
+    $ papermerge-cli pref-list --section=ocr
 
 Show value of preference `trigger` from section `ocr`:
 
-    $ preferences-cli pref-list --section=ocr --name=trigger
+    $ papermerge-cli pref-list --section=ocr --name=trigger
 
 Update value of the preference `trigger` from section `ocr`:
 
-    $ preferences-cli pref-update --section=ocr --name=trigger --value=auto
+    $ papermerge-cli pref-update --section=ocr --name=trigger --value=auto

@@ -120,9 +120,19 @@ def current_user(
 
 
 @click.command
+@click.option(
+    '--section',
+    help='Limit output to preferences from this section only',
+)
+@click.option(
+    '--name',
+    help='Limit output to preferences with this only',
+)
 @click.pass_context
 def pref_list(
-    ctx
+    ctx,
+    section,
+    name
 ):
     """List preferences"""
     token = ctx.obj['TOKEN']
@@ -130,6 +140,8 @@ def pref_list(
     perform_pref_list(
         host=host,
         token=token,
+        section=section,
+        name=name
     )
 
 
@@ -145,6 +157,7 @@ def pref_update(
         host=host,
         token=token,
     )
+
 
 cli.add_command(auth)
 cli.add_command(_import)
