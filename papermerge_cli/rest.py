@@ -250,6 +250,7 @@ def perform_pref_list(
     section: str | None = None,
     name: str | None = None
 ) -> None:
+    """Shows preferences of the user identified by token"""
     restapi_client = get_restapi_client(host, token)
     api_instance = preferences_api.PreferencesApi(restapi_client)
     response = api_instance.preferences_list()
