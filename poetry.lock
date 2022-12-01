@@ -35,7 +35,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "papermerge-restapi-client"
-version = "1.0.14"
+version = "1.0.15"
 description = "Papermerge REST API"
 category = "main"
 optional = false
@@ -91,7 +91,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "6b753be0e18303fd9c00557062cfcf41c26fd2e3ba7336567a8e8595dec481bb"
+content-hash = "2e40e1aa88e0fb44a2c64d93d8a1a703a9f143d9912c4811b9c093a6b19703b2"
 
 [metadata.files]
 certifi = [
@@ -126,7 +126,7 @@ frozendict = [
     {file = "frozendict-2.3.4.tar.gz", hash = "sha256:15b4b18346259392b0d27598f240e9390fafbff882137a9c48a1e0104fb17f78"},
 ]
 papermerge-restapi-client = [
-    {file = "papermerge-restapi-client-1.0.14.tar.gz", hash = "sha256:b445429295873b4ed8e4ef277bbadce21e00869fcfa7aaa9c4a2ade3a107f941"},
+    {file = "papermerge-restapi-client-1.0.15.tar.gz", hash = "sha256:d7cc6b39e9990805e21437e403a16e09b9447b5edb87cba6e950741037ff578a"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},

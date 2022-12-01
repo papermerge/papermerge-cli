@@ -147,8 +147,23 @@ def pref_list(
 
 @click.command
 @click.pass_context
+@click.option(
+    '--section',
+    help='Section name of the preference to update',
+)
+@click.option(
+    '--name',
+    help='Name of the preference to update',
+)
+@click.option(
+    '--value',
+    help='New value for the preference specified by section and name',
+)
 def pref_update(
-    ctx
+    ctx,
+    section,
+    name,
+    value
 ):
     """List preferences"""
     token = ctx.obj['TOKEN']
@@ -156,6 +171,9 @@ def pref_update(
     perform_pref_update(
         host=host,
         token=token,
+        section=section,
+        name=name,
+        value=value
     )
 
 

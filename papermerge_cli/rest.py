@@ -264,5 +264,23 @@ def perform_pref_list(
             click.echo(f"section={_sec} name={_name} value={value}")
 
 
-def perform_pref_update(host: str, token: str) -> None:
-    pass
+def perform_pref_update(
+    host: str,
+    token: str,
+    section: str,
+    name: str,
+    value: str
+) -> None:
+    """Update given preference identified by section and name"""
+    restapi_client = get_restapi_client(host, token)
+    api_instance = preferences_api.PreferencesApi(restapi_client)
+
+    body = dict()
+    body[f"{section}__{name}"] = value
+
+    api_instance.preferences_bulk_create(
+        body=body,
+        skip_deserialization=True,
+        content_type='application/json'
+    )
+    click.echo(f"'{section}__{name}' successfully set to '{value}'")
