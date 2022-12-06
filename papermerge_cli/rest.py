@@ -7,7 +7,8 @@ from papermerge_restapi_client.apis.tags import (
     users_api,
     nodes_api,
     documents_api,
-    preferences_api
+    preferences_api,
+    search_api
 )
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
@@ -284,3 +285,20 @@ def perform_pref_update(
         content_type='application/json'
     )
     click.echo(f"'{section}__{name}' successfully set to '{value}'")
+
+
+def perform_search(
+    host: str,
+    token: str,
+    query: str
+) -> None:
+
+    restapi_client = get_restapi_client(host, token)
+    api_instance = search_api.SearchApi(restapi_client)
+
+    query_params = dict(q=query)
+
+    resp = api_instance.search(
+        query_params=query_params
+    )
+    click.echo(resp)
