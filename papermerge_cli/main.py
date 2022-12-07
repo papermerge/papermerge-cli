@@ -194,7 +194,8 @@ def pref_update(
     '--tags-op',
     help='Should node contain all or any of the provided tags?',
     type=click.Choice(['all', 'any']),
-    default='all'
+    default='all',
+    show_default=True
 )
 def search(
     ctx,
