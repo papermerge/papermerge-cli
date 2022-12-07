@@ -185,9 +185,22 @@ def pref_update(
     '--query',
     help='Text to search for',
 )
+@click.option(
+    '-t',
+    '--tags',
+    help='Comma separated list of tags',
+)
+@click.option(
+    '--tags-op',
+    help='Should node contain all or any of the provided tags?',
+    type=click.Choice(['all', 'any']),
+    default='all'
+)
 def search(
     ctx,
-    query
+    query,
+    tags,
+    tags_op
 ):
     """Search for document or folder containing given text"""
     token = ctx.obj['TOKEN']
@@ -195,7 +208,9 @@ def search(
     perform_search(
         host=host,
         token=token,
-        query=query
+        query=query,
+        tags=tags,
+        tags_op=tags_op
     )
 
 
