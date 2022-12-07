@@ -39,7 +39,7 @@ jobs:
   publish-to-pypi:
     name: Publish to Pypi
     needs: [ "version-bump" ]
-    uses: papermerge/papermerge-core/.github/workflows/publish-to-pypi.yml
+    uses: papermerge/papermerge-core/.github/workflows/publish-to-pypi.yml@master
     if: ${{ github.event.inputs.publish-to-pypi == 'true' }}
     secrets:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
