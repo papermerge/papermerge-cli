@@ -7,7 +7,8 @@ from .rest import (
     perform_me,
     perform_import,
     perform_pref_list,
-    perform_pref_update
+    perform_pref_update,
+    perform_search
 )
 
 PREFIX = 'PAPERMERGE_CLI'
@@ -177,9 +178,47 @@ def pref_update(
     )
 
 
+@click.command
+@click.pass_context
+@click.option(
+    '-q',
+    '--query',
+    help='Text to search for',
+)
+@click.option(
+    '-t',
+    '--tags',
+    help='Comma separated list of tags',
+)
+@click.option(
+    '--tags-op',
+    help='Should node contain all or any of the provided tags?',
+    type=click.Choice(['all', 'any']),
+    default='all',
+    show_default=True
+)
+def search(
+    ctx,
+    query,
+    tags,
+    tags_op
+):
+    """Search for document or folder containing given text"""
+    token = ctx.obj['TOKEN']
+    host = ctx.obj['HOST']
+    perform_search(
+        host=host,
+        token=token,
+        query=query,
+        tags=tags,
+        tags_op=tags_op
+    )
+
+
 cli.add_command(auth)
 cli.add_command(_import)
 cli.add_command(_list)  # list nodes
 cli.add_command(current_user)
 cli.add_command(pref_list)
 cli.add_command(pref_update)
+cli.add_command(search)
