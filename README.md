@@ -99,3 +99,28 @@ In case you want to search for nodes with ANY of the provided tags, use `tags-op
 Finally, `tags` and `q` may be combined:
 
     $ papermerge-cli search --tags important -q apartment
+
+### download
+
+Downloads a folder or a document:
+
+    $ papermerge-cli download --uuid <document or folder uuid>
+
+In case uuid is the ID of specific folder - a zip file will be downloaded; zip file will contain
+all nodes insides specified folder.
+
+You can use `--uuid` multiple times:
+
+    $ papermerge-cli download --uuid <uuid of doc1> --uuid <uuid of doc2> --uuid <uuid of folder 1>
+
+If you want to download content to specific file on your file-system, use `-f` option:
+
+    $ papermerge-cli download --uuid <doc-uuid> -f /path/to/file-system/document.pdf
+
+or in case of uuid is a folder:
+
+    $ papermerge-cli download --uuid <folder-uuid>  -f /path/to/file-system/folder.zip
+
+You can also specify the format/type of the downloaded archive (e.g. in case node is either a folder):
+
+     $ papermerge-cli download --uuid <folder-uuid>  -f /path/to/file-system/folder.targz -t targz
