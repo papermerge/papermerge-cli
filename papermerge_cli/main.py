@@ -8,7 +8,8 @@ from .rest import (
     perform_import,
     perform_pref_list,
     perform_pref_update,
-    perform_search
+    perform_search,
+    perform_download
 )
 
 PREFIX = 'PAPERMERGE_CLI'
@@ -215,6 +216,46 @@ def search(
     )
 
 
+@click.command
+@click.pass_context
+@click.option(
+    '-u',
+    '--uuid',
+    help='UUID of the node to download. You can use this option multiple times',
+    type=click.UUID,
+    multiple=True
+)
+@click.option(
+    '-f',
+    '--file-name',
+    help='Name of the file where to save downloaded document/folder',
+)
+@click.option(
+    '-t',
+    '--archive-type',
+    help='Download node as tar.gz or as .zip',
+    type=click.Choice(['zip', 'targz']),
+    default='zip',
+    show_default=True
+)
+def download(
+    ctx,
+    uuid: tuple[click.UUID],
+    file_name: str,
+    archive_type: str
+):
+    """Download one or multiple nodes"""
+    token = ctx.obj['TOKEN']
+    host = ctx.obj['HOST']
+    perform_download(
+        host=host,
+        token=token,
+        uuids=uuid,
+        file_name=file_name,
+        archive_type=archive_type
+    )
+
+
 cli.add_command(auth)
 cli.add_command(_import)
 cli.add_command(_list)  # list nodes
@@ -222,3 +263,4 @@ cli.add_command(current_user)
 cli.add_command(pref_list)
 cli.add_command(pref_update)
 cli.add_command(search)
+cli.add_command(download)

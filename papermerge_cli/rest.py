@@ -321,3 +321,43 @@ def perform_search(
             f"{ntype}\t{item['title']}\t{item['id']}\t{breadcrumb}"
             f"\t{item['tags']}"
         )
+
+
+def perform_download(
+    host: str,
+    token: str,
+    uuids: tuple[click.UUID],
+    archive_type: str,
+    file_name: str = None,
+) -> None:
+
+    restapi_client = get_restapi_client(host, token)
+    api_instance = nodes_api.NodesDownload(restapi_client)
+    query_params = {
+        'node_ids': uuids,
+        'archive_type': archive_type
+    }
+
+    response = api_instance.nodes_download(
+        query_params=query_params,
+        accept_content_types=(
+            '*/*',
+        ),
+        skip_deserialization=True
+    )
+    if file_name is None:
+        _file_name = 'default'
+
+        for key, value in response.response.headers.items():
+            if 'content-disposition' in key.lower():
+                # value example = 'attachment; filename=brother_004309.pdf'
+                # from the value we need file name
+                _file_name = value.split(';')[1].split('=')[1]
+
+        file_name = _file_name
+
+    with open(file_name, 'wb') as f:
+        f.write(response.response.data)
+
+    click.echo(f"Downloaded to {file_name}")
+

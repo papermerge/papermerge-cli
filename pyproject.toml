@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 click = "^8.1.3"
-papermerge-restapi-client = "^1.0.19"
+papermerge-restapi-client = "^1.0.20"
 
 [tool.poetry.scripts]
 papermerge-cli = "papermerge_cli.main:cli"
