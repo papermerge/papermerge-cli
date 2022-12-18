@@ -35,6 +35,8 @@ def backoff_giveup_condition(
     if should_retry:
         click.echo("Retrying...")
 
+    # Should not retry.
+    # If True -> do not try anymore i.e. give up
     return not should_retry
 
 
@@ -409,4 +411,3 @@ def perform_download(
         f.write(response.response.data)
 
     click.echo(f"Downloaded to {file_name}")
-
