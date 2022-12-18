@@ -204,7 +204,13 @@ def perform_me(
     click.echo(f'inbox folder uuid={inbox_folder_uuid}')
 
 
-def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None) -> None:
+def perform_import(
+    host: str,
+    token: str,
+    file_or_folder: str,
+    parent_uuid=None,
+    delete_after_upload: bool=False
+) -> None:
     """Performs recursive import of given path"""
     restapi_client = get_restapi_client(host, token)
     if parent_uuid is None:
@@ -219,6 +225,8 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
             parent_uuid=parent_uuid,
             file_path=file_or_folder
         )
+        if delete_after_upload:
+            os.remove(file_or_folder)
         return
 
     # If we are here, this means that file_or_folder is actually a path to
@@ -231,6 +239,8 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
                 parent_uuid=parent_uuid,
                 file_path=entry.path
             )
+            if delete_after_upload:
+                os.remove(entry.path)
         else:
             folder_title = os.path.basename(entry.path)
             folder_uuid = create_folder(
@@ -242,8 +252,11 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
                 host=host,
                 token=token,
                 file_or_folder=entry.path,
-                parent_uuid=folder_uuid
+                parent_uuid=folder_uuid,
+                delete_after_upload=delete_after_upload
             )
+            if delete_after_upload:
+                os.rmdir(entry.path)
 
 
 def perform_pref_list(

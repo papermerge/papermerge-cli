@@ -64,17 +64,22 @@ def auth(ctx, username, password):
 
 @click.command(name="import")
 @click.argument('file_or_folder')
+@click.option(
+    '--delete',
+    help='Delete local(s) file after successful upload',
+    is_flag=True,
+)
 @click.pass_context
-def _import(ctx, file_or_folder):
+def _import(ctx, file_or_folder, delete):
     """Import documents from local folder"""
 
     host=ctx.obj['HOST']
     token = ctx.obj['TOKEN']
-
     perform_import(
         host=host,
         token=token,
-        file_or_folder=file_or_folder
+        file_or_folder=file_or_folder,
+        delete_after_upload=delete
     )
 
 
