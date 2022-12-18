@@ -1,5 +1,6 @@
 import os
 import click
+import backoff
 import papermerge_restapi_client
 
 from papermerge_restapi_client.apis.tags import (
@@ -13,6 +14,29 @@ from papermerge_restapi_client.apis.tags import (
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
 from .utils import pretty_breadcrumb
+
+
+def backoff_giveup_condition(
+    exception: papermerge_restapi_client.exceptions.ApiException
+) -> bool:
+    """
+    Decides if it is the case to retry the REST API call
+    :param exception: exception raised by REST API client
+    :return: True - means - do not retry i.e. give up
+        False - means - please retry the REST API call
+
+    This method is designed to be used only as argument
+    to the decorator `backoff.on_exception`
+    """
+
+    # Will retry only of REST API exception had status 502 i.e. bad gateway
+    should_retry = exception.status > 500
+
+    if should_retry:
+        click.echo("Retrying...")
+
+    return not should_retry
+
 
 def get_restapi_client(host, token):
     configuration = papermerge_restapi_client.Configuration(host=host)
@@ -30,10 +54,16 @@ def get_user_home_uuid(restapi_client):
     return ret
 
 
+@backoff.on_exception(
+    backoff.expo,
+    papermerge_restapi_client.exceptions.ApiException,
+    max_tries=10,
+    giveup=backoff_giveup_condition
+)
 def create_folder(
-        restapi_client,
-        parent_uuid: str,
-        title: str
+    restapi_client,
+    parent_uuid: str,
+    title: str
 ) -> str:
     nodes_api_instance = nodes_api.NodesCreate(restapi_client)
 
@@ -59,6 +89,12 @@ def create_folder(
     return folder_uuid
 
 
+@backoff.on_exception(
+    backoff.expo,
+    papermerge_restapi_client.exceptions.ApiException,
+    max_tries=10,
+    giveup=backoff_giveup_condition
+)
 def upload_document(restapi_client, parent_uuid, file_path):
     nodes_api_instance = nodes_api.NodesCreate(restapi_client)
     title = os.path.basename(file_path)
