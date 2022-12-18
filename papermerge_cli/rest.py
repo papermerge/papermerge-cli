@@ -1,5 +1,6 @@
 import os
 import click
+import backoff
 import papermerge_restapi_client
 
 from papermerge_restapi_client.apis.tags import (
@@ -13,6 +14,31 @@ from papermerge_restapi_client.apis.tags import (
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
 from .utils import pretty_breadcrumb
+
+
+def backoff_giveup_condition(
+    exception: papermerge_restapi_client.exceptions.ApiException
+) -> bool:
+    """
+    Decides if it is the case to retry the REST API call
+    :param exception: exception raised by REST API client
+    :return: True - means - do not retry i.e. give up
+        False - means - please retry the REST API call
+
+    This method is designed to be used only as argument
+    to the decorator `backoff.on_exception`
+    """
+
+    # Will retry only of REST API exception had status 502 i.e. bad gateway
+    should_retry = exception.status > 500
+
+    if should_retry:
+        click.echo("Retrying...")
+
+    # Should not retry.
+    # If True -> do not try anymore i.e. give up
+    return not should_retry
+
 
 def get_restapi_client(host, token):
     configuration = papermerge_restapi_client.Configuration(host=host)
@@ -30,10 +56,16 @@ def get_user_home_uuid(restapi_client):
     return ret
 
 
+@backoff.on_exception(
+    backoff.expo,
+    papermerge_restapi_client.exceptions.ApiException,
+    max_tries=10,
+    giveup=backoff_giveup_condition
+)
 def create_folder(
-        restapi_client,
-        parent_uuid: str,
-        title: str
+    restapi_client,
+    parent_uuid: str,
+    title: str
 ) -> str:
     nodes_api_instance = nodes_api.NodesCreate(restapi_client)
 
@@ -59,6 +91,12 @@ def create_folder(
     return folder_uuid
 
 
+@backoff.on_exception(
+    backoff.expo,
+    papermerge_restapi_client.exceptions.ApiException,
+    max_tries=10,
+    giveup=backoff_giveup_condition
+)
 def upload_document(restapi_client, parent_uuid, file_path):
     nodes_api_instance = nodes_api.NodesCreate(restapi_client)
     title = os.path.basename(file_path)
@@ -204,7 +242,13 @@ def perform_me(
     click.echo(f'inbox folder uuid={inbox_folder_uuid}')
 
 
-def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None) -> None:
+def perform_import(
+    host: str,
+    token: str,
+    file_or_folder: str,
+    parent_uuid=None,
+    delete_after_upload: bool=False
+) -> None:
     """Performs recursive import of given path"""
     restapi_client = get_restapi_client(host, token)
     if parent_uuid is None:
@@ -219,6 +263,8 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
             parent_uuid=parent_uuid,
             file_path=file_or_folder
         )
+        if delete_after_upload:
+            os.remove(file_or_folder)
         return
 
     # If we are here, this means that file_or_folder is actually a path to
@@ -231,6 +277,8 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
                 parent_uuid=parent_uuid,
                 file_path=entry.path
             )
+            if delete_after_upload:
+                os.remove(entry.path)
         else:
             folder_title = os.path.basename(entry.path)
             folder_uuid = create_folder(
@@ -242,8 +290,11 @@ def perform_import(host: str, token: str, file_or_folder: str, parent_uuid=None)
                 host=host,
                 token=token,
                 file_or_folder=entry.path,
-                parent_uuid=folder_uuid
+                parent_uuid=folder_uuid,
+                delete_after_upload=delete_after_upload
             )
+            if delete_after_upload:
+                os.rmdir(entry.path)
 
 
 def perform_pref_list(
@@ -360,4 +411,3 @@ def perform_download(
         f.write(response.response.data)
 
     click.echo(f"Downloaded to {file_name}")
-
