@@ -3,6 +3,10 @@
 Command line utility which uses REST API to interact with your Papermerge DMS
 instance
 
+## Requirements
+
+In order to
+
 ## Install
 
     $ pip install papermerge-cli
