@@ -1,6 +1,7 @@
 # Papermerge Cli
 
-Command line utility which uses REST API to interact with your Papermerge DMS instance
+Command line utility which uses REST API to interact with your Papermerge DMS
+instance
 
 ## Install
 
@@ -21,15 +22,15 @@ Papermerge Cli will prompt you for username and password. On successfull
 authentication your REST API token will be displayed - now you can use
 this token for all subsequent authentications.
 
-Use token for authentication by exporting token as PAPERMERGE_CLI__TOKEN environment
-variable:
+Use token for authentication by exporting token as `PAPERMERGE_CLI__TOKEN`
+environment variable:
 
     $ export PAPERMERGE_CLI__TOKEN=mytoken
 
 ### list
 
-Now, with `PAPERMERGE_CLI__HOST` and `PAPERMERGE_CLI__TOKEN` environment variables
-set you can use list content of you home folder:
+Now, with `PAPERMERGE_CLI__HOST` and `PAPERMERGE_CLI__TOKEN` environment
+variables set you can use list content of you home folder:
 
     $ papermerge-cli list
 
@@ -39,7 +40,8 @@ In order to list content of specific folder (including inbox folder):
 
 ### me
 
-In order to see current user details (current user UUID, home folder UUID, inbox folder UUID, username etc):
+In order to see current user details (current user UUID, home folder UUID, inbox
+folder UUID, username etc):
 
     $ papermerge-cli me
 
@@ -63,7 +65,6 @@ Update value of the preference `trigger` from section `ocr`:
 
     $ papermerge-cli pref-update --section=ocr --name=trigger --value=auto
 
-
 ### import
 
 Recursively imports folder from local filesystem. For example, in order
@@ -75,24 +76,35 @@ You can also import one single document
 
     $ papermerge-cli import /path/to/some/document.pdf
 
+If you want the local copy the uploaded documents **to be deleted** after
+successful import - add `--delete` flag:
+
+    $ papermerge-cli import --delete /path/to/folder/
+
+PLEASE BE CAREFUL WITH `--delete` FLAG AS IT WILL IRREVERSIBLE DELETE THE LOCAL
+COPY OF THE UPLOADED DOCUMENT!
+
 ### search
 
 Search for node (document or folder) by text or by tags:
 
     $ papermerge-cli search -q apotheke
 
-Returns all documents (or folders with such title) containing OCRed text 'apotheke'.
+Returns all documents (or folders with such title) containing OCRed
+text 'apotheke'.
 
 You can search by tags only:
 
     $ papermerge-cli search --tags important
 
-Will search for all documents (and folders) which were tagged with tag 'important'
-When multiple tags are provided, by default, will search for nodes with all mentioned tags:
+Will search for all documents (and folders) which were tagged with
+tag 'important' When multiple tags are provided, by default, will search for
+nodes with all mentioned tags:
 
     $ papermerge-cli search --tags important,letters  # returns nodes with both tags important AND letters
 
-In case you want to search for nodes with ANY of the provided tags, use `tags-op` parameter:
+In case you want to search for nodes with ANY of the provided tags, use
+`tags-op` parameter:
 
     $ papermerge-cli search --tags important,letters --tags-op any
 
@@ -106,14 +118,15 @@ Downloads a folder or a document:
 
     $ papermerge-cli download --uuid <document or folder uuid>
 
-In case uuid is the ID of specific folder - a zip file will be downloaded; zip file will contain
-all nodes insides specified folder.
+In case uuid is the ID of specific folder - a zip file will be downloaded; zip
+file will contain all nodes insides specified folder.
 
 You can use `--uuid` multiple times:
 
     $ papermerge-cli download --uuid <uuid of doc1> --uuid <uuid of doc2> --uuid <uuid of folder 1>
 
-If you want to download content to specific file on your file-system, use `-f` option:
+If you want to download content to specific file on your file-system, use `-f`
+option:
 
     $ papermerge-cli download --uuid <doc-uuid> -f /path/to/file-system/document.pdf
 
