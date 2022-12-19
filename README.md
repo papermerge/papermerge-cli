@@ -76,14 +76,13 @@ You can also import one single document
 
     $ papermerge-cli import /path/to/some/document.pdf
 
-If you want **uploaded documents to be deleted** after successful
-import - add `--delete` flag:
+If you want the local copy the uploaded documents **to be deleted** after
+successful import - add `--delete` flag:
 
     $ papermerge-cli import --delete /path/to/folder/
 
 PLEASE BE CAREFUL WITH `--delete` FLAG AS IT WILL IRREVERSIBLE DELETE THE LOCAL
-COPY OF THE UPLOADED DOCUMENT.
-
+COPY OF THE UPLOADED DOCUMENT!
 
 ### search
 
