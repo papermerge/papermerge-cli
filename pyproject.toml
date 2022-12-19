@@ -25,7 +25,7 @@ start_string = "<!-- towncrier release notes start -->\n"
 underlines = ["", "", ""]
 template = "changelog.d/changelog_template.jinja"
 title_format = "## {version} - {project_date}"
-issue_format = "[#{issue}](https://github.com/papermerge/papermerge-cli/issues/{issue})"
+issue_format = "[Issue#{issue}](https://github.com/papermerge/papermerge-cli/issues/{issue})"
 
 [[tool.towncrier.type]]
 directory = "security"
