@@ -7,3 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the changes for the upcoming release can be found in <https://github.com/twisted/my-project/tree/main/changelog.d/>.
 
 <!-- towncrier release notes start -->
+
+## 0.3.0 - 2022-12-19
+
+
+### Added
+
+- Relax python requirement from strict 3.10.x to >= 3.8 and < 3.11 [#11](https://github.com/papermerge/papermerge-cli/issues/11)

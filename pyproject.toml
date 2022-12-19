@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "papermerge-cli"
-version = "0.2.2"
+version = "0.3.0"
 description = "Command line utility for your Papermerge DMS instance"
 authors = ["Eugen Ciur <eugen@papermerge.com>"]
 license = "Apache 2.0"
