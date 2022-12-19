@@ -1,5 +1,6 @@
 import os
 import click
+import pkg_resources
 
 from .rest import (
     perform_auth,
@@ -15,7 +16,7 @@ from .rest import (
 PREFIX = 'PAPERMERGE_CLI'
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.pass_context
 @click.option(
     '--host',
@@ -30,10 +31,25 @@ PREFIX = 'PAPERMERGE_CLI'
     envvar=f'{PREFIX}__TOKEN',
     help='Authentication token.'
 )
-def cli(ctx, host, token):
-    ctx.ensure_object(dict)
-    ctx.obj['HOST'] = host
-    ctx.obj['TOKEN'] = token
+@click.option(
+    '--version',
+    help='Show version of the papermerge-cli',
+    is_flag=True
+)
+def cli(ctx, host, token, version):
+    if ctx.invoked_subcommand is None:
+        # invoked without sub-command i.e. display version
+        if version:
+            papermerge_cli_version = pkg_resources.get_distribution(
+                'papermerge-cli'
+            ).version
+            click.echo(papermerge_cli_version)
+    else:
+        # run sub-command
+        ctx.ensure_object(dict)
+        ctx.obj['HOST'] = host
+        ctx.obj['TOKEN'] = token
+
 
 
 @click.command()
