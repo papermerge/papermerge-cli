@@ -17,6 +17,7 @@ papermerge-cli = "papermerge_cli.main:cli"
 
 [tool.poetry.group.dev.dependencies]
 towncrier = "^22.8.0"
+pytest = "^7.2.0"
 
 [tool.towncrier]
 directory = "changelog.d"

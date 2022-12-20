@@ -12,6 +12,7 @@ from .rest import (
     perform_search,
     perform_download
 )
+from .utils import sanitize_host
 
 PREFIX = 'PAPERMERGE_CLI'
 
@@ -47,7 +48,7 @@ def cli(ctx, host, token, version):
     else:
         # run sub-command
         ctx.ensure_object(dict)
-        ctx.obj['HOST'] = host
+        ctx.obj['HOST'] = sanitize_host(host)
         ctx.obj['TOKEN'] = token
 
 
