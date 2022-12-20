@@ -9,6 +9,20 @@ can be found in [changelog.d folder](https://github.com/papermerge/papermerge-cl
 
 <!-- towncrier release notes start -->
 
+## 0.3.1 - 2022-12-20
+
+
+### Added
+
+- add `--version` flag which will show papermerge-cli version [Issue#13](https://github.com/papermerge/papermerge-cli/issues/13)
+
+
+### Fixed
+
+- Fixes exception when host name contains trailing slash [Issue#15](https://github.com/papermerge/papermerge-cli/issues/15)
+- auth commassnd sshou not addddskpapp for paspasw  orpapd confirmation [Issue#17](https://github.com/papermerge/papermerge-cli/issues/17)
+
+
 ## 0.3.0 - 2022-12-19
 
 
