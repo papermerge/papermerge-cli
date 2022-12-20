@@ -20,7 +20,7 @@ can be found in [changelog.d folder](https://github.com/papermerge/papermerge-cl
 ### Fixed
 
 - Fixes exception when host name contains trailing slash [Issue#15](https://github.com/papermerge/papermerge-cli/issues/15)
-- auth commassnd sshou not addddskpapp for paspasw  orpapd confirmation [Issue#17](https://github.com/papermerge/papermerge-cli/issues/17)
+- auth command should not ask for password confirmation [Issue#17](https://github.com/papermerge/papermerge-cli/issues/17)
 
 
 ## 0.3.0 - 2022-12-19
