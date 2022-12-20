@@ -1,7 +1,8 @@
 # Papermerge Cli
 
 Command line utility which uses REST API to interact with your Papermerge DMS
-instance
+instance. You can use `papermerge-cli`, for example, to recursively import local folder to
+your Papermerge DMS instance.
 
 ## Requirements
 
@@ -11,6 +12,11 @@ You need [python](https://www.python.org/) version >= 3.8.
 ## Install
 
     $ pip install papermerge-cli
+
+[pip](https://pypi.org/project/pip/) is package installer for python - it usually comes with python
+interpreter. In order to install `pip` on Ubuntu use following command:
+
+    $ sudo apt install python3-pip
 
 ## Usage
 
