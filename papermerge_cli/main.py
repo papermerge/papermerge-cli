@@ -65,7 +65,7 @@ def cli(ctx, host, token, version):
     '-p',
     prompt=True,
     hide_input=True,
-    confirmation_prompt=True,
+    confirmation_prompt=False,
     help='Password'
 )
 @click.pass_context
