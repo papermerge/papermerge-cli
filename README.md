@@ -7,7 +7,7 @@ your Papermerge DMS instance.
 ## Requirements
 
 In order to use `papermerge-cli` you need to have python installed.
-You need [python](https://www.python.org/) version >= 3.8.
+You need [python](https://www.python.org/) version >= 3.10.
 
 ## Install
 

@@ -32,7 +32,8 @@ def auth_required(func):
                     " and PAPERMERGE_CLI__TOKEN?"
                 )
                 return
-
+            print(e)
+            return
         return result
 
     return inner

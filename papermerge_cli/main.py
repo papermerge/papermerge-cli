@@ -83,12 +83,24 @@ def auth(ctx, username, password):
 @click.argument('file_or_folder')
 @click.option(
     '--delete',
-    help='Delete local(s) file after successful upload',
+    help='Delete local(s) file after successful upload.',
     is_flag=True,
 )
+@click.option(
+    '--target-uuid',
+    help="UUID of the target/destination folder. "
+         "Default value is user's Inbox folder's UUID.",
+)
 @click.pass_context
-def _import(ctx, file_or_folder, delete):
-    """Import documents from local folder"""
+def _import(ctx, file_or_folder, delete, target_uuid):
+    """Import recursively documents from local folder
+
+    If target UUID (--target-uuid) is not provided, target node UUID
+    defaults to the user's inbox folder UUID. In other words, import will
+    upload all documents to the user's inbox - if you want to change that, you
+    need to provide UUID of the folder where you want to upload
+    documents to.
+    """
 
     host=ctx.obj['HOST']
     token = ctx.obj['TOKEN']
@@ -96,7 +108,8 @@ def _import(ctx, file_or_folder, delete):
         host=host,
         token=token,
         file_or_folder=file_or_folder,
-        delete_after_upload=delete
+        delete_after_upload=delete,
+        parent_uuid=target_uuid
     )
 
 

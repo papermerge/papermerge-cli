@@ -265,7 +265,7 @@ def perform_import(
     """Performs recursive import of given path"""
     restapi_client = get_restapi_client(host, token)
     if parent_uuid is None:
-        parent_uuid = get_user_home_uuid(restapi_client)
+        parent_uuid = get_user_inbox_uuid(restapi_client)
 
     if os.path.isfile(file_or_folder):
         # if file_or_folder is a path to document (i.e. file),then just
