@@ -1,6 +1,9 @@
 import os
 import click
 import pkg_resources
+from rich.console import Console
+
+console = Console()
 
 from .rest import (
     perform_auth,
@@ -21,7 +24,6 @@ PREFIX = 'PAPERMERGE_CLI'
 @click.pass_context
 @click.option(
     '--host',
-    default=lambda: os.environ.get('HOST', None),
     envvar=f'{PREFIX}__HOST',
     help='URL to REST API host. It ends with slash and it includes protocol'
     'scheme as well. For example: http://localhost:8000/'
@@ -50,7 +52,6 @@ def cli(ctx, host, token, version):
         ctx.ensure_object(dict)
         ctx.obj['HOST'] = sanitize_host(host)
         ctx.obj['TOKEN'] = token
-
 
 
 @click.command()
@@ -101,7 +102,6 @@ def _import(ctx, file_or_folder, delete, target_uuid):
     need to provide UUID of the folder where you want to upload
     documents to.
     """
-
     host=ctx.obj['HOST']
     token = ctx.obj['TOKEN']
     perform_import(
@@ -172,8 +172,8 @@ def pref_list(
     name
 ):
     """List preferences"""
-    token = ctx.obj['TOKEN']
-    host = ctx.obj['HOST']
+    token = ctx.obj.get('TOKEN', None)
+    host = ctx.obj.get('HOST', None)
     perform_pref_list(
         host=host,
         token=token,
@@ -203,8 +203,8 @@ def pref_update(
     value
 ):
     """List preferences"""
-    token = ctx.obj['TOKEN']
-    host = ctx.obj['HOST']
+    token = ctx.obj.get('TOKEN', None)
+    host = ctx.obj('HOST', None)
     perform_pref_update(
         host=host,
         token=token,

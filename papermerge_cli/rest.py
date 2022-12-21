@@ -2,6 +2,8 @@ import os
 import click
 import backoff
 import papermerge_restapi_client
+from rich.console import Console
+from rich.table import Table
 
 from papermerge_restapi_client.apis.tags import (
     auth_api,
@@ -14,6 +16,9 @@ from papermerge_restapi_client.apis.tags import (
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
 from .utils import pretty_breadcrumb, auth_required
+
+
+console = Console()
 
 
 def backoff_giveup_condition(
@@ -247,11 +252,20 @@ def perform_me(
     inbox_folder_uuid = \
         response.body['data']['relationships']['inbox_folder']['data']['id']
 
-    click.echo(f'user_uuid={user_uuid}')
-    click.echo(f'username={username}')
-    click.echo(f'email={email}')
-    click.echo(f'home folder uuid={home_folder_uuid}')
-    click.echo(f'inbox folder uuid={inbox_folder_uuid}')
+    table = Table(
+        title=f"Current User (username={username}/email={email})"
+    )
+
+    table.add_column("User/UUID", no_wrap=True)
+    table.add_column("Home/UUID", no_wrap=True)
+    table.add_column("Inbox/UUID", no_wrap=True)
+
+    table.add_row(
+        user_uuid,
+        home_folder_uuid,
+        inbox_folder_uuid
+    )
+    console.print(table)
 
 
 @auth_required
