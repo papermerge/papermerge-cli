@@ -13,7 +13,7 @@ from papermerge_restapi_client.apis.tags import (
 )
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
-from .utils import pretty_breadcrumb
+from .utils import pretty_breadcrumb, auth_required
 
 
 def backoff_giveup_condition(
@@ -47,6 +47,7 @@ def get_restapi_client(host, token):
     return papermerge_restapi_client.ApiClient(configuration)
 
 
+@auth_required
 def get_user_home_uuid(restapi_client):
     api_instance = users_api.UsersApi(restapi_client)
 
@@ -56,6 +57,16 @@ def get_user_home_uuid(restapi_client):
     return ret
 
 
+@auth_required
+def get_user_inbox_uuid(restapi_client):
+    api_instance = users_api.UsersApi(restapi_client)
+
+    resp = api_instance.users_me_retrieve()
+    ret = resp.body['data']['relationships']['inbox_folder']['data']['id']
+
+    return ret
+
+@auth_required
 @backoff.on_exception(
     backoff.expo,
     papermerge_restapi_client.exceptions.ApiException,
@@ -90,7 +101,7 @@ def create_folder(
 
     return folder_uuid
 
-
+@auth_required
 @backoff.on_exception(
     backoff.expo,
     papermerge_restapi_client.exceptions.ApiException,
@@ -154,7 +165,7 @@ def perform_auth(host, username, password):
     api_response = api_instance.auth_login_create(auth_body)
     return api_response.body['token']
 
-
+@auth_required
 def perform_list(
     host,
     token,
@@ -213,6 +224,7 @@ def perform_list(
         click.echo(f"{type_letter} {title} {uuid}")
 
 
+@auth_required
 def perform_me(
     host,
     token
@@ -242,6 +254,7 @@ def perform_me(
     click.echo(f'inbox folder uuid={inbox_folder_uuid}')
 
 
+@auth_required
 def perform_import(
     host: str,
     token: str,
@@ -296,7 +309,7 @@ def perform_import(
             if delete_after_upload:
                 os.rmdir(entry.path)
 
-
+@auth_required
 def perform_pref_list(
     host: str,
     token: str,
@@ -316,7 +329,7 @@ def perform_pref_list(
         if (section is None or section == _sec) and (name is None or _name == name):
             click.echo(f"section={_sec} name={_name} value={value}")
 
-
+@auth_required
 def perform_pref_update(
     host: str,
     token: str,
@@ -339,6 +352,7 @@ def perform_pref_update(
     click.echo(f"'{section}__{name}' successfully set to '{value}'")
 
 
+@auth_required
 def perform_search(
     host: str,
     token: str,
@@ -373,7 +387,7 @@ def perform_search(
             f"\t{item['tags']}"
         )
 
-
+@auth_required
 def perform_download(
     host: str,
     token: str,

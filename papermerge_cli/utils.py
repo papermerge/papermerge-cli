@@ -1,3 +1,5 @@
+import click
+from papermerge_restapi_client.exceptions import ApiException
 
 def pretty_breadcrumb(path: tuple) -> str:
     return f"/{'/'.join(path)}"
@@ -16,3 +18,21 @@ def sanitize_host(host: str) -> str:
         return sanitize_host(clean_host)
 
     return host
+
+
+def auth_required(func):
+    def inner(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except ApiException as e:
+            if e.status == 401:
+                click.echo(
+                    "Unable to authenticate.\n"
+                    "Did you set PAPERMERGE_CLI__HOST"
+                    " and PAPERMERGE_CLI__TOKEN?"
+                )
+                return
+
+        return result
+
+    return inner
