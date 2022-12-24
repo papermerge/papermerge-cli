@@ -25,15 +25,10 @@ def sanitize_host(host: str) -> str|None:
     return host
 
 
-def auth_required(func):
-    def inner(host, token, *args, **kwargs):
-        if host is None:
-            console.print(
-                "Neither [b]PAPERMERGE_CLI__HOST[/b] not set"
-                " nor [b]--host[/b] option was provided",
-                style="red"
-            )
-            return
+def token_required(func):
+    def inner(**kwargs):
+        token = kwargs.get('token', None)
+
         if token is None:
             console.print(
                 "Neither [b]PAPERMERGE_CLI__TOKEN[/b] not set"
@@ -41,8 +36,30 @@ def auth_required(func):
                 style="red"
             )
             return
+        return func(**kwargs)
+
+    return inner
+
+def host_required(func):
+    def inner(**kwargs):
+        token = kwargs.get('host', None)
+
+        if token is None:
+            console.print(
+                "Neither [b]PAPERMERGE_CLI__HOST[/b] not set"
+                " nor [b]--host[/b] option was provided",
+                style="red"
+            )
+            return
+        return func(**kwargs)
+
+    return inner
+
+
+def catch_401(func):
+    def inner(*args, **kwargs):
         try:
-            result = func(host, token, *args, **kwargs)
+            return func(*args, **kwargs)
         except ApiException as e:
             if e.status == 401:
                 console.print("Unable to authenticate", style="red")
@@ -52,7 +69,6 @@ def auth_required(func):
                     " correctly?"
                 )
                 return
-
-        return result
+            raise ApiException from e
 
     return inner

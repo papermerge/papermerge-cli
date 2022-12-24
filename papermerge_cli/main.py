@@ -119,6 +119,11 @@ def _import(ctx, file_or_folder, delete, target_uuid):
     help='Parent folder UUID'
 )
 @click.option(
+    '--inbox',
+    help='List nodes from Inbox folder',
+    is_flag=True
+)
+@click.option(
     '--page-number',
     help='Page number to list',
     default=1
@@ -129,13 +134,18 @@ def _import(ctx, file_or_folder, delete, target_uuid):
     default=15
 )
 @click.pass_context
-def _list(ctx, parent_uuid, page_number, page_size):
-    """Lists documents and folders"""
+def _list(ctx, parent_uuid, inbox, page_number, page_size):
+    """Lists documents and folders of the given node
+
+    If in case no specific node is requested - will list content
+    of the user's home folder.
+    """
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
     perform_list(
         host=host,
         token=token,
+        inbox=inbox,
         parent_uuid=parent_uuid,
         page_number=page_number,
         page_size=page_size
@@ -204,7 +214,7 @@ def pref_update(
 ):
     """List preferences"""
     token = ctx.obj.get('TOKEN', None)
-    host = ctx.obj('HOST', None)
+    host = ctx.obj.get('HOST', None)
     perform_pref_update(
         host=host,
         token=token,
