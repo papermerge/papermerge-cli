@@ -46,8 +46,8 @@ def host_required(func):
 
         if token is None:
             console.print(
-                "Neither [b]PAPERMERGE_CLI__TOKEN[/b] not set"
-                " nor [b]--token[/b] option was provided",
+                "Neither [b]PAPERMERGE_CLI__HOST[/b] not set"
+                " nor [b]--host[/b] option was provided",
                 style="red"
             )
             return
@@ -69,6 +69,6 @@ def catch_401(func):
                     " correctly?"
                 )
                 return
-
+            raise ApiException from e
 
     return inner

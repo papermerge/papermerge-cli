@@ -13,6 +13,7 @@ from papermerge_restapi_client.apis.tags import (
     preferences_api,
     search_api
 )
+from papermerge_restapi_client.exceptions import ApiException
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
 from .utils import pretty_breadcrumb, host_required, token_required, catch_401
@@ -175,6 +176,7 @@ def perform_auth(host, username, password):
 def perform_list(
     host,
     token,
+    inbox: bool = False,
     parent_uuid=None,
     page_number=1,
     page_size=15
@@ -200,9 +202,19 @@ def perform_list(
         nodes_api_instance = nodes_api.NodesApi(api_client)
 
     if parent_uuid is None:
-        path_params = {
-            'id': home_folder_uuid,
-        }
+        # in case no specific parent uuid is requested
+        # will list the content of user home's folder
+
+        if inbox is True:
+            # however, if flag `--inbox` is provided, will
+            # list content of user's inbox folder
+            path_params = {
+                'id': inbox_folder_uuid
+            }
+        else:
+            path_params = {
+                'id': home_folder_uuid,
+            }
     else:
         path_params = {
             'id': parent_uuid
@@ -221,13 +233,22 @@ def perform_list(
     page = response.body['meta']['pagination']['page']
     pages = response.body['meta']['pagination']['pages']
     count = response.body['meta']['pagination']['count']
-    click.echo(f"Page={page} of {pages}. Total nodes={count}")
+
+    table = Table(
+        title=f"Page={page} of {pages}. Total nodes={count}"
+    )
+    table.add_column("Type")
+    table.add_column("Title")
+    table.add_column("UUID", no_wrap=True)
 
     for node in response.body['data']:
-        type_letter = 'd' if node['type'] == 'Document' else 'f'
-        title = node['attributes']['title']
-        uuid = node['id']
-        click.echo(f"{type_letter} {title} {uuid}")
+        table.add_row(
+            node['type'],
+            node['attributes']['title'],
+            node['id']
+        )
+
+    console.print(table)
 
 @catch_401
 @host_required
@@ -311,11 +332,20 @@ def perform_import(
                 os.remove(entry.path)
         else:
             folder_title = os.path.basename(entry.path)
-            folder_uuid = create_folder(
-                restapi_client,
-                parent_uuid=parent_uuid,
-                title=folder_title,
-            )
+
+            try:
+                folder_uuid = create_folder(
+                    restapi_client,
+                    parent_uuid=parent_uuid,
+                    title=folder_title,
+                )
+            except ApiException:
+                console.print(
+                    f"Failed to create folder '[b]{folder_title}[/b]'.",
+                    style="red"
+                )
+                continue
+
             perform_import(
                 host=host,
                 token=token,
