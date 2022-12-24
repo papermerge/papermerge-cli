@@ -9,6 +9,14 @@ can be found in [changelog.d folder](https://github.com/papermerge/papermerge-cl
 
 <!-- towncrier release notes start -->
 
+## 0.3.3 - 2022-12-24
+
+
+### Added
+
+- Show tabelar output using rich styles [Issue#noissue](https://github.com/papermerge/papermerge-cli/issues/noissue)
+
+
 ## 0.3.2 - 2022-12-24
 
 

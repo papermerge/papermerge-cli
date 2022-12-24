@@ -1,1 +1,0 @@
-Show tabelar output using rich styles
