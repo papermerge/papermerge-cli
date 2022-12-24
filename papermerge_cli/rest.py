@@ -370,13 +370,26 @@ def perform_pref_list(
     api_instance = preferences_api.PreferencesApi(restapi_client)
     response = api_instance.preferences_list()
 
+    table = Table(
+        title="Preferences"
+    )
+
+    table.add_column("Section")
+    table.add_column("Name")
+    table.add_column("Value")
+
     for item in response.body['data']:
         pref = item['attributes']
         _sec = pref['section']
         _name = pref['name']
         value = pref['value']
         if (section is None or section == _sec) and (name is None or _name == name):
-            click.echo(f"section={_sec} name={_name} value={value}")
+            table.add_row(
+                _sec,
+                _name,
+                value
+            )
+    console.print(table)
 
 @catch_401
 @token_required

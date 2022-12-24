@@ -214,7 +214,7 @@ def pref_update(
 ):
     """List preferences"""
     token = ctx.obj.get('TOKEN', None)
-    host = ctx.obj('HOST', None)
+    host = ctx.obj.get('HOST', None)
     perform_pref_update(
         host=host,
         token=token,
