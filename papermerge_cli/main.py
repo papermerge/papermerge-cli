@@ -1,6 +1,9 @@
 import os
 import click
 import pkg_resources
+from rich.console import Console
+
+console = Console()
 
 from .rest import (
     perform_auth,
@@ -21,7 +24,6 @@ PREFIX = 'PAPERMERGE_CLI'
 @click.pass_context
 @click.option(
     '--host',
-    default=lambda: os.environ.get('HOST', None),
     envvar=f'{PREFIX}__HOST',
     help='URL to REST API host. It ends with slash and it includes protocol'
     'scheme as well. For example: http://localhost:8000/'
@@ -50,7 +52,6 @@ def cli(ctx, host, token, version):
         ctx.ensure_object(dict)
         ctx.obj['HOST'] = sanitize_host(host)
         ctx.obj['TOKEN'] = token
-
 
 
 @click.command()
@@ -83,20 +84,32 @@ def auth(ctx, username, password):
 @click.argument('file_or_folder')
 @click.option(
     '--delete',
-    help='Delete local(s) file after successful upload',
+    help='Delete local(s) file after successful upload.',
     is_flag=True,
 )
+@click.option(
+    '--target-uuid',
+    help="UUID of the target/destination folder. "
+         "Default value is user's Inbox folder's UUID.",
+)
 @click.pass_context
-def _import(ctx, file_or_folder, delete):
-    """Import documents from local folder"""
+def _import(ctx, file_or_folder, delete, target_uuid):
+    """Import recursively documents from local folder
 
+    If target UUID (--target-uuid) is not provided, target node UUID
+    defaults to the user's inbox folder UUID. In other words, import will
+    upload all documents to the user's inbox - if you want to change that, you
+    need to provide UUID of the folder where you want to upload
+    documents to.
+    """
     host=ctx.obj['HOST']
     token = ctx.obj['TOKEN']
     perform_import(
         host=host,
         token=token,
         file_or_folder=file_or_folder,
-        delete_after_upload=delete
+        delete_after_upload=delete,
+        parent_uuid=target_uuid
     )
 
 
@@ -159,8 +172,8 @@ def pref_list(
     name
 ):
     """List preferences"""
-    token = ctx.obj['TOKEN']
-    host = ctx.obj['HOST']
+    token = ctx.obj.get('TOKEN', None)
+    host = ctx.obj.get('HOST', None)
     perform_pref_list(
         host=host,
         token=token,
@@ -190,8 +203,8 @@ def pref_update(
     value
 ):
     """List preferences"""
-    token = ctx.obj['TOKEN']
-    host = ctx.obj['HOST']
+    token = ctx.obj.get('TOKEN', None)
+    host = ctx.obj('HOST', None)
     perform_pref_update(
         host=host,
         token=token,

@@ -2,6 +2,8 @@ import os
 import click
 import backoff
 import papermerge_restapi_client
+from rich.console import Console
+from rich.table import Table
 
 from papermerge_restapi_client.apis.tags import (
     auth_api,
@@ -13,7 +15,10 @@ from papermerge_restapi_client.apis.tags import (
 )
 from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
-from .utils import pretty_breadcrumb
+from .utils import pretty_breadcrumb, auth_required
+
+
+console = Console()
 
 
 def backoff_giveup_condition(
@@ -47,6 +52,7 @@ def get_restapi_client(host, token):
     return papermerge_restapi_client.ApiClient(configuration)
 
 
+@auth_required
 def get_user_home_uuid(restapi_client):
     api_instance = users_api.UsersApi(restapi_client)
 
@@ -56,6 +62,16 @@ def get_user_home_uuid(restapi_client):
     return ret
 
 
+@auth_required
+def get_user_inbox_uuid(restapi_client):
+    api_instance = users_api.UsersApi(restapi_client)
+
+    resp = api_instance.users_me_retrieve()
+    ret = resp.body['data']['relationships']['inbox_folder']['data']['id']
+
+    return ret
+
+@auth_required
 @backoff.on_exception(
     backoff.expo,
     papermerge_restapi_client.exceptions.ApiException,
@@ -90,7 +106,7 @@ def create_folder(
 
     return folder_uuid
 
-
+@auth_required
 @backoff.on_exception(
     backoff.expo,
     papermerge_restapi_client.exceptions.ApiException,
@@ -154,7 +170,7 @@ def perform_auth(host, username, password):
     api_response = api_instance.auth_login_create(auth_body)
     return api_response.body['token']
 
-
+@auth_required
 def perform_list(
     host,
     token,
@@ -213,6 +229,7 @@ def perform_list(
         click.echo(f"{type_letter} {title} {uuid}")
 
 
+@auth_required
 def perform_me(
     host,
     token
@@ -235,13 +252,23 @@ def perform_me(
     inbox_folder_uuid = \
         response.body['data']['relationships']['inbox_folder']['data']['id']
 
-    click.echo(f'user_uuid={user_uuid}')
-    click.echo(f'username={username}')
-    click.echo(f'email={email}')
-    click.echo(f'home folder uuid={home_folder_uuid}')
-    click.echo(f'inbox folder uuid={inbox_folder_uuid}')
+    table = Table(
+        title=f"Current User (username={username}/email={email})"
+    )
+
+    table.add_column("User/UUID", no_wrap=True)
+    table.add_column("Home/UUID", no_wrap=True)
+    table.add_column("Inbox/UUID", no_wrap=True)
+
+    table.add_row(
+        user_uuid,
+        home_folder_uuid,
+        inbox_folder_uuid
+    )
+    console.print(table)
 
 
+@auth_required
 def perform_import(
     host: str,
     token: str,
@@ -252,7 +279,7 @@ def perform_import(
     """Performs recursive import of given path"""
     restapi_client = get_restapi_client(host, token)
     if parent_uuid is None:
-        parent_uuid = get_user_home_uuid(restapi_client)
+        parent_uuid = get_user_inbox_uuid(restapi_client)
 
     if os.path.isfile(file_or_folder):
         # if file_or_folder is a path to document (i.e. file),then just
@@ -296,7 +323,7 @@ def perform_import(
             if delete_after_upload:
                 os.rmdir(entry.path)
 
-
+@auth_required
 def perform_pref_list(
     host: str,
     token: str,
@@ -316,7 +343,7 @@ def perform_pref_list(
         if (section is None or section == _sec) and (name is None or _name == name):
             click.echo(f"section={_sec} name={_name} value={value}")
 
-
+@auth_required
 def perform_pref_update(
     host: str,
     token: str,
@@ -339,6 +366,7 @@ def perform_pref_update(
     click.echo(f"'{section}__{name}' successfully set to '{value}'")
 
 
+@auth_required
 def perform_search(
     host: str,
     token: str,
@@ -373,7 +401,7 @@ def perform_search(
             f"\t{item['tags']}"
         )
 
-
+@auth_required
 def perform_download(
     host: str,
     token: str,
