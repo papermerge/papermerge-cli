@@ -6,7 +6,6 @@ from rich.console import Console
 console = Console()
 
 from .rest import (
-    perform_auth,
     perform_list,
     perform_me,
     perform_import,
@@ -32,7 +31,7 @@ PREFIX = 'PAPERMERGE_CLI'
     '-t', '--token',
     default=lambda: os.environ.get('TOKEN', None),
     envvar=f'{PREFIX}__TOKEN',
-    help='Authentication token.'
+    help='JWT authorization token.'
 )
 @click.option(
     '--version',
@@ -52,32 +51,6 @@ def cli(ctx, host, token, version):
         ctx.ensure_object(dict)
         ctx.obj['HOST'] = sanitize_host(host)
         ctx.obj['TOKEN'] = token
-
-
-@click.command()
-@click.option(
-    '--username',
-    '-u',
-    prompt=True,
-    help='Username'
-)
-@click.option(
-    '--password',
-    '-p',
-    prompt=True,
-    hide_input=True,
-    confirmation_prompt=False,
-    help='Password'
-)
-@click.pass_context
-def auth(ctx, username, password):
-    """Authenticate with username and password"""
-    token = perform_auth(
-        host=ctx.obj['HOST'],
-        username=username,
-        password=password
-    )
-    click.echo(token)
 
 
 @click.command(name="import")
@@ -301,7 +274,6 @@ def download(
     )
 
 
-cli.add_command(auth)
 cli.add_command(_import)
 cli.add_command(_list)  # list nodes
 cli.add_command(current_user)

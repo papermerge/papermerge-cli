@@ -6,7 +6,6 @@ from rich.console import Console
 from rich.table import Table
 
 from papermerge_restapi_client.apis.tags import (
-    auth_api,
     users_api,
     nodes_api,
     documents_api,
@@ -14,10 +13,10 @@ from papermerge_restapi_client.apis.tags import (
     search_api
 )
 from papermerge_restapi_client.exceptions import ApiException
-from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
 from .utils import pretty_breadcrumb, host_required, token_required, catch_401
-
+from .api_client import ApiClient
+from .types import User
 
 console = Console()
 
@@ -155,21 +154,6 @@ def upload_document(restapi_client, parent_uuid, file_path):
     )
 
 
-def perform_auth(host, username, password):
-    configuration = papermerge_restapi_client.Configuration(host=host)
-
-    # Enter a context with an instance of the API client
-    with papermerge_restapi_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        api_instance = auth_api.AuthApi(api_client)
-        auth_body = AuthTokenRequest(
-            username=username,
-            password=password,
-        )
-
-    api_response = api_instance.auth_login_create(auth_body)
-    return api_response.body['token']
-
 @token_required
 @host_required
 @catch_401
@@ -257,26 +241,11 @@ def perform_me(
     host,
     token
 ):
-    configuration = papermerge_restapi_client.Configuration(host=host)
-    configuration.api_key['Token Authentication'] = f'Token {token}'
-
-    # Enter a context with an instance of the API client
-    with papermerge_restapi_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        api_instance = users_api.UsersApi(api_client)
-
-    response = api_instance.users_me_retrieve()
-
-    user_uuid = response.body['data']['id']
-    username = response.body['data']['attributes']['username']
-    email = response.body['data']['attributes']['email']
-    home_folder_uuid = \
-        response.body['data']['relationships']['home_folder']['data']['id']
-    inbox_folder_uuid = \
-        response.body['data']['relationships']['inbox_folder']['data']['id']
+    api_client = ApiClient(token=token, host=host)
+    user: User = api_client.get('/api/users/me')
 
     table = Table(
-        title=f"Current User (username={username}/email={email})"
+        title=f"Current User (username={user.username}/email={user.email})"
     )
 
     table.add_column("User/UUID", no_wrap=True)
@@ -284,9 +253,9 @@ def perform_me(
     table.add_column("Inbox/UUID", no_wrap=True)
 
     table.add_row(
-        user_uuid,
-        home_folder_uuid,
-        inbox_folder_uuid
+        str(user.id),
+        user.home_folder_id,
+        user.inbox_folder_id
     )
     console.print(table)
 
