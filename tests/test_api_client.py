@@ -1,11 +1,11 @@
-import uuid
+from uuid import UUID
 
 from papermerge_cli.types import User
 from papermerge_cli.api_client import ApiClient
 
 
 def test_fetch_user(requests_mock):
-    api_client = ApiClient(token='abc1', host='http://test')
+    api_client = ApiClient[User](token='abc1', host='http://test')
 
     requests_mock.get('http://test/api/users/me', json={
         'id': 'ae86d82a-c8c5-4249-9d83-f722797edb8b',
@@ -17,8 +17,7 @@ def test_fetch_user(requests_mock):
         'inbox_folder_id': '3ad82662-7a69-4b8e-b7b3-06dababa6001'
 
     })
-    json_response = api_client.get('/api/users/me')
-    u = User(**json_response)
+    user = api_client.get('/api/users/me', response_modal=User)
 
-    assert u.email == 'john@mail.com'
-    assert u.home_folder_id == uuid.UUID('a82cbe8e-fa0e-4aec-8950-7fcbeaef186c')
+    assert user.email == 'john@mail.com'
+    assert user.home_folder_id == UUID('a82cbe8e-fa0e-4aec-8950-7fcbeaef186c')

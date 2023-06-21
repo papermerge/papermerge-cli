@@ -13,12 +13,12 @@ class ApiClient(Generic[T]):
         self.host = host
         self.token = token
 
-    def get(self, url: str):
+    def get(self, url: str, response_modal=T) -> T:
         response = requests.get(
             f"{self.host}{url}",
             headers=self.headers
         )
-        return response.json()
+        return response_modal(**response.json())
 
     @property
     def headers(self) -> dict[str, str]:

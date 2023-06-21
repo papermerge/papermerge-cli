@@ -14,9 +14,11 @@ from papermerge_restapi_client.apis.tags import (
 )
 from papermerge_restapi_client.exceptions import ApiException
 
+from papermerge_cli.format import current_user as format_current_user
+from papermerge_cli.fetch import current_user as fetch_current_user
+
 from .utils import pretty_breadcrumb, host_required, token_required, catch_401
-from .api_client import ApiClient
-from .types import User
+
 
 console = Console()
 
@@ -234,30 +236,15 @@ def perform_list(
 
     console.print(table)
 
-@catch_401
-@host_required
-@token_required
+
 def perform_me(
     host: str,
     token: str
 ) -> None:
-    api_client = ApiClient[User](token=token, host=host)
-    user: User = api_client.get('/api/users/me')
-
-    table = Table(
-        title=f"Current User (username={user.username}/email={user.email})"
-    )
-
-    table.add_column("User/UUID", no_wrap=True)
-    table.add_column("Home/UUID", no_wrap=True)
-    table.add_column("Inbox/UUID", no_wrap=True)
-
-    table.add_row(
-        str(user.id),
-        user.home_folder_id,
-        user.inbox_folder_id
-    )
+    user = fetch_current_user(host, token)
+    table = format_current_user(user)
     console.print(table)
+
 
 @token_required
 @host_required
