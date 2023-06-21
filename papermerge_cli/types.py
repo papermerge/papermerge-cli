@@ -9,5 +9,5 @@ class User(BaseModel):
     email: str
     created_at: datetime
     updated_at: datetime
-    home_folder_id: UUID | None
-    inbox_folder_id: UUID | None
+    home_folder_id: UUID
+    inbox_folder_id: UUID

@@ -238,10 +238,10 @@ def perform_list(
 @host_required
 @token_required
 def perform_me(
-    host,
-    token
-):
-    api_client = ApiClient(token=token, host=host)
+    host: str,
+    token: str
+) -> None:
+    api_client = ApiClient[User](token=token, host=host)
     user: User = api_client.get('/api/users/me')
 
     table = Table(
