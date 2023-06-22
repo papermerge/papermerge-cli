@@ -3,7 +3,7 @@ name: Tests
 on: push
 
 jobs:
-  version-bump:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
