@@ -1,5 +1,4 @@
-[![Tests](https://github.com/papermerge/papermerge-cli/actions/workflows/tests.
-yml/badge.svg)](https://github.com/papermerge/papermerge-cli/actions/workflows/tests.yml)
+[![Tests](https://github.com/papermerge/papermerge-cli/actions/workflows/tests.yml/badge.svg)](https://github.com/papermerge/papermerge-cli/actions/workflows/tests.yml)
 
 # Papermerge Cli
 
