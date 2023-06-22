@@ -3,12 +3,15 @@ import click
 import pkg_resources
 from rich.console import Console
 
-console = Console()
+from papermerge_cli.schema import User, Node, Paginator
 
-from .rest import (
-    perform_auth,
-    perform_list,
-    perform_me,
+from papermerge_cli.rest.users import me as perform_me
+from papermerge_cli.rest.nodes import list_nodes
+
+import papermerge_cli.format.users as format_users
+import papermerge_cli.format.nodes as format_nodes
+
+from .depricated_rest import (
     perform_import,
     perform_pref_list,
     perform_pref_update,
@@ -16,6 +19,9 @@ from .rest import (
     perform_download
 )
 from .utils import sanitize_host
+
+
+console = Console()
 
 PREFIX = 'PAPERMERGE_CLI'
 
@@ -32,7 +38,7 @@ PREFIX = 'PAPERMERGE_CLI'
     '-t', '--token',
     default=lambda: os.environ.get('TOKEN', None),
     envvar=f'{PREFIX}__TOKEN',
-    help='Authentication token.'
+    help='JWT authorization token.'
 )
 @click.option(
     '--version',
@@ -52,32 +58,6 @@ def cli(ctx, host, token, version):
         ctx.ensure_object(dict)
         ctx.obj['HOST'] = sanitize_host(host)
         ctx.obj['TOKEN'] = token
-
-
-@click.command()
-@click.option(
-    '--username',
-    '-u',
-    prompt=True,
-    help='Username'
-)
-@click.option(
-    '--password',
-    '-p',
-    prompt=True,
-    hide_input=True,
-    confirmation_prompt=False,
-    help='Password'
-)
-@click.pass_context
-def auth(ctx, username, password):
-    """Authenticate with username and password"""
-    token = perform_auth(
-        host=ctx.obj['HOST'],
-        username=username,
-        password=password
-    )
-    click.echo(token)
 
 
 @click.command(name="import")
@@ -142,7 +122,7 @@ def _list(ctx, parent_uuid, inbox, page_number, page_size):
     """
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    perform_list(
+    data: Paginator[Node] = list_nodes(
         host=host,
         token=token,
         inbox=inbox,
@@ -151,6 +131,8 @@ def _list(ctx, parent_uuid, inbox, page_number, page_size):
         page_size=page_size
     )
 
+    output = format_nodes.list_nodes(data)
+    console.print(output)
 
 @click.command(name="me")
 @click.pass_context
@@ -160,10 +142,13 @@ def current_user(
     """Show details of current user"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    perform_me(
+    user: User = perform_me(
         host=host,
         token=token,
     )
+    output = format_users.current_user(user)
+
+    console.print(output)
 
 
 @click.command
@@ -301,7 +286,6 @@ def download(
     )
 
 
-cli.add_command(auth)
 cli.add_command(_import)
 cli.add_command(_list)  # list nodes
 cli.add_command(current_user)

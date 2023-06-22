@@ -6,7 +6,6 @@ from rich.console import Console
 from rich.table import Table
 
 from papermerge_restapi_client.apis.tags import (
-    auth_api,
     users_api,
     nodes_api,
     documents_api,
@@ -14,7 +13,6 @@ from papermerge_restapi_client.apis.tags import (
     search_api
 )
 from papermerge_restapi_client.exceptions import ApiException
-from papermerge_restapi_client.model.auth_token_request import AuthTokenRequest
 
 from .utils import pretty_breadcrumb, host_required, token_required, catch_401
 
@@ -155,140 +153,7 @@ def upload_document(restapi_client, parent_uuid, file_path):
     )
 
 
-def perform_auth(host, username, password):
-    configuration = papermerge_restapi_client.Configuration(host=host)
 
-    # Enter a context with an instance of the API client
-    with papermerge_restapi_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        api_instance = auth_api.AuthApi(api_client)
-        auth_body = AuthTokenRequest(
-            username=username,
-            password=password,
-        )
-
-    api_response = api_instance.auth_login_create(auth_body)
-    return api_response.body['token']
-
-@token_required
-@host_required
-@catch_401
-def perform_list(
-    host,
-    token,
-    inbox: bool = False,
-    parent_uuid=None,
-    page_number=1,
-    page_size=15
-):
-    configuration = papermerge_restapi_client.Configuration(host=host)
-    configuration.api_key['Token Authentication'] = f'Token {token}'
-
-    # Enter a context with an instance of the API client
-    with papermerge_restapi_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        api_instance = users_api.UsersApi(api_client)
-
-    response = api_instance.users_me_retrieve()
-
-    user_uuid = response.body['data']['id']
-    home_folder_uuid = \
-        response.body['data']['relationships']['home_folder']['data']['id']
-    inbox_folder_uuid = \
-        response.body['data']['relationships']['inbox_folder']['data']['id']
-
-    with papermerge_restapi_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        nodes_api_instance = nodes_api.NodesApi(api_client)
-
-    if parent_uuid is None:
-        # in case no specific parent uuid is requested
-        # will list the content of user home's folder
-
-        if inbox is True:
-            # however, if flag `--inbox` is provided, will
-            # list content of user's inbox folder
-            path_params = {
-                'id': inbox_folder_uuid
-            }
-        else:
-            path_params = {
-                'id': home_folder_uuid,
-            }
-    else:
-        path_params = {
-            'id': parent_uuid
-        }
-
-    query_params = {
-        'page[number]': page_number,
-        'page[size]': page_size
-    }
-
-    response = nodes_api_instance.node_retrieve(
-        path_params=path_params,
-        query_params=query_params
-    )
-
-    page = response.body['meta']['pagination']['page']
-    pages = response.body['meta']['pagination']['pages']
-    count = response.body['meta']['pagination']['count']
-
-    table = Table(
-        title=f"Page={page} of {pages}. Total nodes={count}"
-    )
-    table.add_column("Type")
-    table.add_column("Title")
-    table.add_column("UUID", no_wrap=True)
-
-    for node in response.body['data']:
-        table.add_row(
-            node['type'],
-            node['attributes']['title'],
-            node['id']
-        )
-
-    console.print(table)
-
-@catch_401
-@host_required
-@token_required
-def perform_me(
-    host,
-    token
-):
-    configuration = papermerge_restapi_client.Configuration(host=host)
-    configuration.api_key['Token Authentication'] = f'Token {token}'
-
-    # Enter a context with an instance of the API client
-    with papermerge_restapi_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        api_instance = users_api.UsersApi(api_client)
-
-    response = api_instance.users_me_retrieve()
-
-    user_uuid = response.body['data']['id']
-    username = response.body['data']['attributes']['username']
-    email = response.body['data']['attributes']['email']
-    home_folder_uuid = \
-        response.body['data']['relationships']['home_folder']['data']['id']
-    inbox_folder_uuid = \
-        response.body['data']['relationships']['inbox_folder']['data']['id']
-
-    table = Table(
-        title=f"Current User (username={username}/email={email})"
-    )
-
-    table.add_column("User/UUID", no_wrap=True)
-    table.add_column("Home/UUID", no_wrap=True)
-    table.add_column("Inbox/UUID", no_wrap=True)
-
-    table.add_row(
-        user_uuid,
-        home_folder_uuid,
-        inbox_folder_uuid
-    )
-    console.print(table)
 
 @token_required
 @host_required
