@@ -1,3 +1,7 @@
+[![Tests](https://github.com/papermerge/papermerge-cli/actions/workflows/tests.
+yml/badge.svg)](https://github.
+com/papermerge/papermerge-cli/actions/workflows/tests.yml)
+
 # Papermerge Cli
 
 Command line utility which uses REST API to interact with your Papermerge DMS
