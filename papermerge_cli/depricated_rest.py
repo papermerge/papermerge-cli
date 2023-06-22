@@ -14,9 +14,6 @@ from papermerge_restapi_client.apis.tags import (
 )
 from papermerge_restapi_client.exceptions import ApiException
 
-from papermerge_cli.format import current_user as format_current_user
-from papermerge_cli.fetch import current_user as fetch_current_user
-
 from .utils import pretty_breadcrumb, host_required, token_required, catch_401
 
 
@@ -234,15 +231,6 @@ def perform_list(
             node['id']
         )
 
-    console.print(table)
-
-
-def perform_me(
-    host: str,
-    token: str
-) -> None:
-    user = fetch_current_user(host, token)
-    table = format_current_user(user)
     console.print(table)
 
 

@@ -1,1 +1,1 @@
-from .users import current_user
+from .users import get_me

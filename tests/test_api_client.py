@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from papermerge_cli.types import User
+from papermerge_cli.schema.users import User
 from papermerge_cli.api_client import ApiClient
 
 

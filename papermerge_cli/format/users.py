@@ -1,5 +1,5 @@
 from rich.table import Table
-from papermerge_cli.types import User
+from papermerge_cli.schema.users import User
 
 
 def current_user(user: User) -> Table:

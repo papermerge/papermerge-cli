@@ -1,11 +1,12 @@
 from papermerge_cli.utils import (host_required, token_required, catch_401)
 from papermerge_cli.api_client import ApiClient
-from papermerge_cli.types import User
+from papermerge_cli.schema.users import User
+
 
 @catch_401
 @host_required
 @token_required
-def current_user(
+def get_me(
     host: str,
     token: str
 ) -> User:

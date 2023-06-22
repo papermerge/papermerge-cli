@@ -3,11 +3,9 @@ import click
 import pkg_resources
 from rich.console import Console
 
-console = Console()
-
-from .rest import (
+from papermerge_cli.rest.users import me as perform_me
+from .depricated_rest import (
     perform_list,
-    perform_me,
     perform_import,
     perform_pref_list,
     perform_pref_update,
@@ -15,6 +13,9 @@ from .rest import (
     perform_download
 )
 from .utils import sanitize_host
+
+
+console = Console()
 
 PREFIX = 'PAPERMERGE_CLI'
 
@@ -133,10 +134,11 @@ def current_user(
     """Show details of current user"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    perform_me(
+    output = perform_me(
         host=host,
         token=token,
     )
+    console.print(output)
 
 
 @click.command
