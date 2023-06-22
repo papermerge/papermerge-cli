@@ -3,9 +3,15 @@ import click
 import pkg_resources
 from rich.console import Console
 
+from papermerge_cli.schema import User, Node, Paginator
+
 from papermerge_cli.rest.users import me as perform_me
+from papermerge_cli.rest.nodes import list_nodes
+
+import papermerge_cli.format.users as format_users
+import papermerge_cli.format.nodes as format_nodes
+
 from .depricated_rest import (
-    perform_list,
     perform_import,
     perform_pref_list,
     perform_pref_update,
@@ -116,7 +122,7 @@ def _list(ctx, parent_uuid, inbox, page_number, page_size):
     """
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    perform_list(
+    data: Paginator[Node] = list_nodes(
         host=host,
         token=token,
         inbox=inbox,
@@ -125,6 +131,8 @@ def _list(ctx, parent_uuid, inbox, page_number, page_size):
         page_size=page_size
     )
 
+    output = format_nodes.list_nodes(data)
+    console.print(output)
 
 @click.command(name="me")
 @click.pass_context
@@ -134,10 +142,12 @@ def current_user(
     """Show details of current user"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    output = perform_me(
+    user: User = perform_me(
         host=host,
         token=token,
     )
+    output = format_users.current_user(user)
+
     console.print(output)
 
 
