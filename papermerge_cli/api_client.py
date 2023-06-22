@@ -1,11 +1,9 @@
-import requests
-
-from pydantic import BaseModel
 from typing import Generic, TypeVar
 
-
+import requests
 
 T = TypeVar('T')
+
 
 class ApiClient(Generic[T]):
 

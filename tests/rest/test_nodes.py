@@ -1,6 +1,5 @@
-from papermerge_cli.schema import Node, Paginator
-
 from papermerge_cli.rest.nodes import list_nodes
+from papermerge_cli.schema import Node, Paginator
 
 
 def test_list_nodes_returns_only_folders(requests_mock):

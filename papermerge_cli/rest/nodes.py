@@ -1,6 +1,5 @@
-from papermerge_cli.fetch import get_nodes, get_me
-
-from papermerge_cli.schema import User, Node, Paginator
+from papermerge_cli.fetch import get_me, get_nodes
+from papermerge_cli.schema import Node, Paginator, User
 
 
 def list_nodes(

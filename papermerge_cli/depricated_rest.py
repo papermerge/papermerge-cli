@@ -1,21 +1,16 @@
 import os
-import click
+
 import backoff
+import click
 import papermerge_restapi_client
+from papermerge_restapi_client.apis.tags import (documents_api, nodes_api,
+                                                 preferences_api, search_api,
+                                                 users_api)
+from papermerge_restapi_client.exceptions import ApiException
 from rich.console import Console
 from rich.table import Table
 
-from papermerge_restapi_client.apis.tags import (
-    users_api,
-    nodes_api,
-    documents_api,
-    preferences_api,
-    search_api
-)
-from papermerge_restapi_client.exceptions import ApiException
-
-from .utils import pretty_breadcrumb, host_required, token_required, catch_401
-
+from .utils import catch_401, host_required, pretty_breadcrumb, token_required
 
 console = Console()
 
@@ -60,6 +55,7 @@ def get_user_home_uuid(restapi_client):
 
     return ret
 
+
 @catch_401
 def get_user_inbox_uuid(restapi_client):
     api_instance = users_api.UsersApi(restapi_client)
@@ -68,6 +64,7 @@ def get_user_inbox_uuid(restapi_client):
     ret = resp.body['data']['relationships']['inbox_folder']['data']['id']
 
     return ret
+
 
 @catch_401
 @backoff.on_exception(
@@ -103,6 +100,7 @@ def create_folder(
     folder_uuid = response.body['data']['id']
 
     return folder_uuid
+
 
 @catch_401
 @backoff.on_exception(
@@ -153,8 +151,6 @@ def upload_document(restapi_client, parent_uuid, file_path):
     )
 
 
-
-
 @token_required
 @host_required
 @catch_401
@@ -163,7 +159,7 @@ def perform_import(
     token: str,
     file_or_folder: str,
     parent_uuid=None,
-    delete_after_upload: bool=False
+    delete_after_upload: bool = False
 ) -> None:
     """Performs recursive import of given path"""
     restapi_client = get_restapi_client(host, token)
@@ -221,6 +217,7 @@ def perform_import(
             if delete_after_upload:
                 os.rmdir(entry.path)
 
+
 @catch_401
 @token_required
 @host_required
@@ -248,13 +245,15 @@ def perform_pref_list(
         _sec = pref['section']
         _name = pref['name']
         value = pref['value']
-        if (section is None or section == _sec) and (name is None or _name == name):
+        if (section is None or section == _sec) and\
+                (name is None or _name == name):
             table.add_row(
                 _sec,
                 _name,
                 value
             )
     console.print(table)
+
 
 @catch_401
 @token_required
@@ -279,6 +278,7 @@ def perform_pref_update(
         content_type='application/json'
     )
     click.echo(f"'{section}__{name}' successfully set to '{value}'")
+
 
 @catch_401
 @token_required
@@ -316,6 +316,7 @@ def perform_search(
             f"{ntype}\t{item['title']}\t{item['id']}\t{breadcrumb}"
             f"\t{item['tags']}"
         )
+
 
 @catch_401
 @token_required

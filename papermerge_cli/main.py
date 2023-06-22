@@ -1,25 +1,19 @@
 import os
+
 import click
 import pkg_resources
 from rich.console import Console
 
-from papermerge_cli.schema import User, Node, Paginator
-
-from papermerge_cli.rest.users import me as perform_me
-from papermerge_cli.rest.nodes import list_nodes
-
-import papermerge_cli.format.users as format_users
 import papermerge_cli.format.nodes as format_nodes
+import papermerge_cli.format.users as format_users
+from papermerge_cli.rest.nodes import list_nodes
+from papermerge_cli.rest.users import me as perform_me
+from papermerge_cli.schema import Node, Paginator, User
 
-from .depricated_rest import (
-    perform_import,
-    perform_pref_list,
-    perform_pref_update,
-    perform_search,
-    perform_download
-)
+from .depricated_rest import (perform_download, perform_import,
+                              perform_pref_list, perform_pref_update,
+                              perform_search)
 from .utils import sanitize_host
-
 
 console = Console()
 
@@ -82,7 +76,7 @@ def _import(ctx, file_or_folder, delete, target_uuid):
     need to provide UUID of the folder where you want to upload
     documents to.
     """
-    host=ctx.obj['HOST']
+    host = ctx.obj['HOST']
     token = ctx.obj['TOKEN']
     perform_import(
         host=host,
@@ -133,6 +127,7 @@ def _list(ctx, parent_uuid, inbox, page_number, page_size):
 
     output = format_nodes.list_nodes(data)
     console.print(output)
+
 
 @click.command(name="me")
 @click.pass_context
