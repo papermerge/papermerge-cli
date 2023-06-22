@@ -18,4 +18,3 @@ def list_nodes(data: Paginator[Node]) -> Table:
         )
 
     return table
-

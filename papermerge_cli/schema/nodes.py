@@ -44,8 +44,8 @@ class Node(BaseModel):
     def document_validator(cls, value, values):
         if values['ctype'] == NodeType.document:
             return DocumentNode(
-                ocr_status=value.ocr_status,
-                ocr=value.ocr
+                ocr_status=value['ocr_status'],
+                ocr=value['ocr']
             )
 
         return None
