@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import TypeVar
 
-
 DocumentVersion = TypeVar("DocumentVersion")
+
 
 class OCRStatusEnum(str, Enum):
     unknown = 'UNKNOWN'
@@ -10,4 +10,3 @@ class OCRStatusEnum(str, Enum):
     started = 'STARTED'
     success = 'SUCCESS'
     failed = 'FAILED'
-

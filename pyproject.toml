@@ -22,6 +22,7 @@ papermerge-cli = "papermerge_cli.main:cli"
 towncrier = "^22.8.0"
 pytest = "^7.2.0"
 requests-mock = {extras = ["fixture"], version = "^1.11.0"}
+pre-commit = "^3.3.3"
 
 
 [tool.towncrier]
@@ -62,4 +63,3 @@ showcontent = true
 directory = "fixed"
 name = "Fixed"
 showcontent = true
-

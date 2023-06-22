@@ -1,4 +1,5 @@
 from rich.table import Table
+
 from papermerge_cli.schema.users import User
 
 
