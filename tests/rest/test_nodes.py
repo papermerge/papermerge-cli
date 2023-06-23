@@ -34,10 +34,9 @@ def test_list_nodes_returns_only_folders(requests_mock, maker):
         user_id=str(user.id)
     )
 
-    text_payload = Paginator(
-        num_pages=1,
+    text_payload = maker.create(
+        Paginator,
         page_number=1,
-        per_page=5,
         items=folder_items
     ).json()
 
@@ -86,10 +85,9 @@ def test_list_nodes_returns_one_ocred_document(requests_mock, maker):
         user_id=str(user.id)
     )
 
-    text_payload = Paginator(
-        num_pages=1,
+    text_payload = maker.create(
+        Paginator,
         page_number=1,
-        per_page=5,
         items=[node]
     ).json()
 

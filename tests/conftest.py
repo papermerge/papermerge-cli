@@ -2,9 +2,13 @@ import string
 import types
 import uuid
 from datetime import datetime
-from random import choice
+from random import choice, randint
 
 import pytest
+
+
+def gen_integer(min_int: int = 10, max_int: int = 1000) -> int:
+    return randint(min_int, max_int)
 
 
 def gen_string(max_length: int) -> str:
@@ -41,6 +45,8 @@ def generate_str(format: str) -> str | datetime | uuid.UUID:
 def generate_for_type(_type: str, _format: str | None = None):
     if _type == 'string':
         return generate_str(_format)
+    elif _type == 'integer':
+        return gen_integer()
     else:
         raise ValueError("Unsupported type")
 
