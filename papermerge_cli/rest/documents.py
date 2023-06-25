@@ -10,6 +10,7 @@ def upload(
     file_path: Path,
     parent_uuid=None,
 ) -> None:
+
     api_client = ApiClient[Document](token=token, host=host)
     doc_to_create = CreateDocument(
         title=file_path.name,
