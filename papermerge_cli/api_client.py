@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Generic, TypeVar
 
 import requests
@@ -36,6 +37,20 @@ class ApiClient(Generic[T]):
             json=json
         )
         return response_model(**response.json())
+
+    def upload(self, url: str, file_path: Path):
+        title = file_path.name
+        headers = self.headers.update({
+            'Content-Disposition': f'attachment; filename={title}'
+        })
+
+        data = open(file_path, 'rb').read()
+
+        return requests.post(
+            url,
+            headers=headers,
+            data=data
+        )
 
     @property
     def headers(self) -> dict[str, str]:
