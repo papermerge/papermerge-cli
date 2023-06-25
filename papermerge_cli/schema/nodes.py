@@ -57,6 +57,12 @@ class CreateNode(BaseModel):
     parent_id: UUID | None
 
 
+class CreateDocumentNode(BaseModel):
+    title: str
+    ctype: NodeType.document
+    parent_id: UUID | None
+
+
 class MoveNode(BaseModel):
     source_ids: List[UUID]
     target_id: UUID

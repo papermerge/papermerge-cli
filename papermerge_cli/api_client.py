@@ -14,7 +14,7 @@ class ApiClient(Generic[T]):
     def get(
         self,
         url: str,
-        response_modal=T,
+        response_model=T,
         query_params=None
     ) -> T:
         response = requests.get(
@@ -22,7 +22,20 @@ class ApiClient(Generic[T]):
             headers=self.headers,
             params=query_params
         )
-        return response_modal(**response.json())
+        return response_model(**response.json())
+
+    def post(
+        self,
+        url,
+        json,
+        response_model=T
+    ):
+        response = requests.post(
+            f"{self.host}{url}",
+            headers=self.headers,
+            json=json
+        )
+        return response_model(**response.json())
 
     @property
     def headers(self) -> dict[str, str]:
