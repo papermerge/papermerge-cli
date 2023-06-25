@@ -14,6 +14,7 @@ backoff = "^2.2.1"
 rich = "^12.6.0"
 pydantic = {extras = ["email"], version = "^1.10.9"}
 requests = "^2.31.0"
+laconiq = "^0.1.0"
 
 [tool.poetry.scripts]
 papermerge-cli = "papermerge_cli.main:cli"

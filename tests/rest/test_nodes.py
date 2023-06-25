@@ -1,3 +1,5 @@
+from laconiq import make
+
 from papermerge_cli.rest.nodes import list_nodes
 from papermerge_cli.schema import Node, Paginator, User
 
@@ -7,14 +9,14 @@ def titles_generator(items):
         yield item
 
 
-def test_list_nodes_returns_only_folders(requests_mock, maker):
+def test_list_nodes_returns_only_folders(requests_mock):
     """
     In this scenario GET /api/nodes/{node_id} returns
     a list of 3 folders i.e. all with ctype='folder'
     and with document field set to None.
     """
     user_me_url = 'http://test/api/users/me'
-    user = maker.create(User)
+    user = make(User)
     requests_mock.get(
         user_me_url,
         text=user.json()
@@ -25,7 +27,7 @@ def test_list_nodes_returns_only_folders(requests_mock, maker):
     home_id = 'a82cbe8e-fa0e-4aec-8950-7fcbeaef186c'
     nodes_url = f'http://test/api/nodes/{home_id}?{params}'
 
-    folder_items = maker.create(
+    folder_items = make(
         Node,
         _quantity=3,
         ctype="folder",
@@ -34,7 +36,7 @@ def test_list_nodes_returns_only_folders(requests_mock, maker):
         user_id=str(user.id)
     )
 
-    text_payload = maker.create(
+    text_payload = make(
         Paginator,
         page_number=1,
         items=folder_items
@@ -56,13 +58,13 @@ def test_list_nodes_returns_only_folders(requests_mock, maker):
     assert actual_titles == expected_titles
 
 
-def test_list_nodes_returns_one_ocred_document(requests_mock, maker):
+def test_list_nodes_returns_one_ocred_document(requests_mock):
     """
     In this scenario GET /api/nodes/{node_id} returns
     one document which was OCRed.
     """
     user_me_url = 'http://test/api/users/me'
-    user = maker.create(User)
+    user = make(User)
 
     requests_mock.get(
         user_me_url,
@@ -74,7 +76,7 @@ def test_list_nodes_returns_one_ocred_document(requests_mock, maker):
     home_id = user.home_folder_id
     nodes_url = f'http://test/api/nodes/{home_id}?{params}'
 
-    node = maker.create(
+    node = make(
         Node,
         ctype="document",
         title="brother_004813.pdf",
@@ -85,7 +87,7 @@ def test_list_nodes_returns_one_ocred_document(requests_mock, maker):
         user_id=str(user.id)
     )
 
-    text_payload = maker.create(
+    text_payload = make(
         Paginator,
         page_number=1,
         items=[node]
