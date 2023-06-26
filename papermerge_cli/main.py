@@ -7,7 +7,7 @@ from rich.console import Console
 
 import papermerge_cli.format.nodes as format_nodes
 import papermerge_cli.format.users as format_users
-from papermerge_cli.lib.importer import upload as upload_document
+from papermerge_cli.lib.importer import upload_file_or_folder
 from papermerge_cli.lib.nodes import list_nodes
 from papermerge_cli.lib.users import me as perform_me
 from papermerge_cli.schema import Node, Paginator, User
@@ -81,10 +81,10 @@ def _import(ctx, file_or_folder, delete, target_id):
     token = ctx.obj['TOKEN']
 
     try:
-        upload_document(
+        upload_file_or_folder(
             host=host,
             token=token,
-            file_path=Path(file_or_folder),
+            file_or_folder=Path(file_or_folder),
             parent_id=target_id,
         )
     except Exception as ex:
