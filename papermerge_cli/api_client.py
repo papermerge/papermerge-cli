@@ -15,7 +15,7 @@ class ApiClient(Generic[T]):
     def get(
         self,
         url: str,
-        response_model=T,
+        response_model,
         query_params=None
     ) -> T:
         response = requests.get(
@@ -29,28 +29,35 @@ class ApiClient(Generic[T]):
         self,
         url,
         json,
-        response_model=T
+        response_model
     ):
         response = requests.post(
             f"{self.host}{url}",
             headers=self.headers,
-            json=json
+            data=json
         )
+
+        if response.status_code != 201:
+            raise ValueError(response.text)
+
         return response_model(**response.json())
 
-    def upload(self, url: str, file_path: Path):
-        title = file_path.name
-        headers = self.headers.update({
-            'Content-Disposition': f'attachment; filename={title}'
-        })
-
+    def upload(
+        self,
+        url: str,
+        file_path: Path,
+        response_model
+    ) -> T:
         data = open(file_path, 'rb').read()
-
-        return requests.post(
-            url,
-            headers=headers,
-            data=data
+        response = requests.post(
+            f"{self.host}{url}",
+            headers=self.headers,
+            files=dict(file=data)
         )
+        if response.status_code != 200:
+            raise ValueError(response.text)
+
+        return response_model(**response.json())
 
     @property
     def headers(self) -> dict[str, str]:

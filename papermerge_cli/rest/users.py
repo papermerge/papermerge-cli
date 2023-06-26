@@ -1,10 +1,17 @@
-from papermerge_cli.fetch import get_me
-from papermerge_cli.schema import User
+from papermerge_cli.api_client import ApiClient
+from papermerge_cli.schema.users import User
+from papermerge_cli.utils import catch_401, host_required, token_required
 
 
-def me(
+@catch_401
+@host_required
+@token_required
+def get_me(
     host: str,
     token: str
 ) -> User:
-    user: User = get_me(host=host, token=token)
+    """Returns current user instance"""
+    api_client = ApiClient[User](token=token, host=host)
+    user = api_client.get('/api/users/me', response_model=User)
+
     return user

@@ -1,6 +1,6 @@
 from laconiq import make
 
-from papermerge_cli.rest.nodes import list_nodes
+from papermerge_cli.lib.nodes import list_nodes
 from papermerge_cli.schema import Node, Paginator, User
 
 
