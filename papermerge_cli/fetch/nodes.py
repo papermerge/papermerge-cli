@@ -17,7 +17,7 @@ def get_nodes(
     api_client = ApiClient[Paginator[Node]](token=token, host=host)
     paginator = api_client.get(
         f'/api/nodes/{node_id}',
-        response_modal=Paginator[Node],
+        response_model=Paginator[Node],
         query_params=query_params
     )
 

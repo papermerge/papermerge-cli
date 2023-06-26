@@ -12,6 +12,6 @@ def get_me(
 ) -> User:
     """Returns current user instance"""
     api_client = ApiClient[User](token=token, host=host)
-    user = api_client.get('/api/users/me', response_modal=User)
+    user = api_client.get('/api/users/me', response_model=User)
 
     return user

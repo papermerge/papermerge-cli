@@ -19,7 +19,8 @@ def upload(
     )
 
     doc: Document = api_client.post(
-        '/api/nodes/',
+        '/api/nodes',
+        response_model=Document,
         json=doc_to_create.json()
     )
 

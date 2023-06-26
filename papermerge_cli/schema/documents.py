@@ -9,7 +9,7 @@ from papermerge_cli.types import OCRStatusEnum
 
 class CreateDocument(BaseModel):
     title: str
-    ctype: Literal["document"]
+    ctype: Literal["document"] = "document"
     parent_id: UUID | None
     lang: str | None = None
     file_name: str | None = None
