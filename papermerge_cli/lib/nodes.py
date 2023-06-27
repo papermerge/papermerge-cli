@@ -1,3 +1,5 @@
+import uuid
+
 from papermerge_cli.rest import get_me, get_nodes
 from papermerge_cli.schema import Node, Paginator, User
 
@@ -6,7 +8,7 @@ def list_nodes(
     host: str,
     token: str,
     inbox: bool = False,
-    parent_id: str | None = None,
+    parent_id: uuid.UUID | None = None,
     page_number: int = 1,
     page_size: int = 15
 ) -> Paginator[Node]:
