@@ -23,6 +23,9 @@ class ApiClient(Generic[T]):
             headers=self.headers,
             params=query_params
         )
+        if response.status_code != 200:
+            raise ValueError(response.text)
+
         return response_model(**response.json())
 
     def post(

@@ -18,5 +18,5 @@ class Folder(BaseModel):
 
 class CreateFolder(BaseModel):
     title: str
-    ctype: Literal["folder"]
+    ctype: Literal["folder"] = "folder"
     parent_id: UUID | None

@@ -126,13 +126,15 @@ def current_user(
     """Show details of current user"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    user: User = perform_me(
-        host=host,
-        token=token,
-    )
-    output = format_users.current_user(user)
-
-    console.print(output)
+    try:
+        user: User = perform_me(
+            host=host,
+            token=token,
+        )
+        output = format_users.current_user(user)
+        console.print(output)
+    except Exception as ex:
+        console.print(ex)
 
 
 @click.command

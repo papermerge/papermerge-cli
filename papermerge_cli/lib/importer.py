@@ -36,6 +36,7 @@ def upload_file_or_folder(
             )
         else:
             folder_title = Path(entry.path).name
+
             folder: Folder = create_folder(
                 host=host,
                 token=token,
