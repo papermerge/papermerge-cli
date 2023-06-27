@@ -15,7 +15,7 @@ def upload_file_or_folder(
 
     # by default, upload will be uploded to the user home folder
     if parent_id is None:
-        parent_id = user.home_folder_id
+        parent_id = user.inbox_folder_id
 
     if file_or_folder.is_file():
         upload_document(

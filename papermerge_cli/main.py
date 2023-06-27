@@ -38,7 +38,16 @@ PageNumber = Annotated[
     int,
     typer.Option(min=1, max=10000, help='Results list page number')
 ]
-FileOrFolderPath = Annotated[Path, typer.Argument(exists=True)]
+FileOrFolderPath = Annotated[
+    Path,
+    typer.Argument(
+        file_okay=True,
+        dir_okay=True,
+        readable=True,
+        resolve_path=True,
+        help="Local path to file or folder to import"
+    )
+]
 DeleteAfterImport = Annotated[
     bool,
     typer.Option(
@@ -78,23 +87,20 @@ def main(
 
 @app.command(name="import")
 def _import(
-    ctx,
+    ctx: typer.Context,
     file_or_folder: FileOrFolderPath,
-    delete: DeleteAfterImport,
-    target_id: TargetNodeID
+    delete: DeleteAfterImport = False,
+    target_id: TargetNodeID | None = None
 ):
     """Import recursively folders and documents from local storage
 
     If target UUID is not provided import will upload all documents to
     the user's inbox
     """
-    host = ctx.obj['HOST']
-    token = ctx.obj['TOKEN']
-
     try:
         upload_file_or_folder(
-            host=host,
-            token=token,
+            host=ctx.obj['HOST'],
+            token=ctx.obj['TOKEN'],
             file_or_folder=Path(file_or_folder),
             parent_id=target_id,
         )
