@@ -1,10 +1,11 @@
+import importlib.metadata
 import uuid
 from pathlib import Path
 
 import click
-import pkg_resources
 import typer
 from rich.console import Console
+from rich.table import Table
 from typing_extensions import Annotated
 
 import papermerge_cli.format.nodes as format_nodes
@@ -21,7 +22,21 @@ PREFIX = 'PAPERMERGE_CLI'
 console = Console()
 app = typer.Typer()
 
-
+HostEnvVar = Annotated[
+    str,
+    typer.Option(
+        envvar=f"{PREFIX}__HOST",
+        help="REST API host. It ends with slash and it includes protocol"
+             "scheme as well. For example: http://localhost:8000/"
+    ),
+]
+TokenEnvVar = Annotated[
+    str,
+    typer.Option(
+        envvar=f"{PREFIX}__TOKEN",
+        help='JWT authorization token'
+    ),
+]
 ParentFolderID = Annotated[
     uuid.UUID,
     typer.Option(help='Parent folder UUID')
@@ -67,22 +82,24 @@ TargetNodeID = Annotated[
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
-    host: Annotated[str, typer.Option(envvar=f"{PREFIX}__HOST")],
-    token: Annotated[str, typer.Option(envvar=f"{PREFIX}__TOKEN")],
-    version: Annotated[bool, typer.Option(is_flag=True)] = True
+    host: HostEnvVar,
+    token: TokenEnvVar,
+    version: Annotated[bool, typer.Option(is_flag=True)] = False
 ):
+    # run sub-command
+    ctx.ensure_object(dict)
+    ctx.obj['HOST'] = sanitize_host(host)
+    ctx.obj['TOKEN'] = token
+
     if ctx.invoked_subcommand is None:
-        # invoked without sub-command i.e. display version
+        # invoked without sub-command
         if version:
-            papermerge_cli_version = pkg_resources.get_distribution(
-                'papermerge-cli'
-            ).version
+            papermerge_cli_version = importlib.metadata.version(
+                "papermerge-cli"
+            )
             click.echo(papermerge_cli_version)
-    else:
-        # run sub-command
-        ctx.ensure_object(dict)
-        ctx.obj['HOST'] = sanitize_host(host)
-        ctx.obj['TOKEN'] = token
+        else:
+            _list(ctx)
 
 
 @app.command(name="import")
@@ -121,30 +138,29 @@ def _list(
     If in case no specific node is requested - will list content
     of the user's home folder
     """
-    token = ctx.obj['TOKEN']
-    host = ctx.obj['HOST']
     data: Paginator[Node] = list_nodes(
-        host=host,
-        token=token,
+        host=ctx.obj['HOST'],
+        token=ctx.obj['TOKEN'],
         inbox=inbox,
         parent_id=parent_id,
         page_number=page_number,
         page_size=page_size
     )
 
-    output = format_nodes.list_nodes(data)
-    console.print(output)
+    output: Table = format_nodes.list_nodes(data)
+    if len(output.rows):
+        console.print(output)
+    else:
+        console.print("Empty folder")
 
 
 @app.command(name="me")
 def current_user(ctx: typer.Context):
     """Show details of current user"""
-    token = ctx.obj['TOKEN']
-    host = ctx.obj['HOST']
     try:
         user: User = perform_me(
-            host=host,
-            token=token,
+            host=ctx.obj['HOST'],
+            token=ctx.obj['TOKEN'],
         )
         output = format_users.current_user(user)
         console.print(output)
