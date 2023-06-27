@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Generic, TypeVar
 
 import requests
@@ -14,7 +15,7 @@ class ApiClient(Generic[T]):
     def get(
         self,
         url: str,
-        response_modal=T,
+        response_model,
         query_params=None
     ) -> T:
         response = requests.get(
@@ -22,7 +23,44 @@ class ApiClient(Generic[T]):
             headers=self.headers,
             params=query_params
         )
-        return response_modal(**response.json())
+        if response.status_code != 200:
+            raise ValueError(response.text)
+
+        return response_model(**response.json())
+
+    def post(
+        self,
+        url,
+        json,
+        response_model
+    ):
+        response = requests.post(
+            f"{self.host}{url}",
+            headers=self.headers,
+            data=json
+        )
+
+        if response.status_code != 201:
+            raise ValueError(response.text)
+
+        return response_model(**response.json())
+
+    def upload(
+        self,
+        url: str,
+        file_path: Path,
+        response_model
+    ) -> T:
+        data = open(file_path, 'rb').read()
+        response = requests.post(
+            f"{self.host}{url}",
+            headers=self.headers,
+            files=dict(file=data)
+        )
+        if response.status_code != 200:
+            raise ValueError(response.text)
+
+        return response_model(**response.json())
 
     @property
     def headers(self) -> dict[str, str]:

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import click
 import pkg_resources
@@ -6,13 +7,13 @@ from rich.console import Console
 
 import papermerge_cli.format.nodes as format_nodes
 import papermerge_cli.format.users as format_users
-from papermerge_cli.rest.nodes import list_nodes
-from papermerge_cli.rest.users import me as perform_me
+from papermerge_cli.lib.importer import upload_file_or_folder
+from papermerge_cli.lib.nodes import list_nodes
+from papermerge_cli.lib.users import me as perform_me
 from papermerge_cli.schema import Node, Paginator, User
 
-from .depricated_rest import (perform_download, perform_import,
-                              perform_pref_list, perform_pref_update,
-                              perform_search)
+from .depricated_rest import (perform_download, perform_pref_list,
+                              perform_pref_update, perform_search)
 from .utils import sanitize_host
 
 console = Console()
@@ -55,19 +56,19 @@ def cli(ctx, host, token, version):
 
 
 @click.command(name="import")
-@click.argument('file_or_folder')
+@click.argument('file_or_folder', type=click.Path(exists=True))
 @click.option(
     '--delete',
-    help='Delete local(s) file after successful upload.',
     is_flag=True,
+    help='Delete local(s) file after successful upload.',
 )
 @click.option(
-    '--target-uuid',
+    '--target-id',
     help="UUID of the target/destination folder. "
          "Default value is user's Inbox folder's UUID.",
 )
 @click.pass_context
-def _import(ctx, file_or_folder, delete, target_uuid):
+def _import(ctx, file_or_folder, delete, target_id):
     """Import recursively documents from local folder
 
     If target UUID (--target-uuid) is not provided, target node UUID
@@ -78,37 +79,25 @@ def _import(ctx, file_or_folder, delete, target_uuid):
     """
     host = ctx.obj['HOST']
     token = ctx.obj['TOKEN']
-    perform_import(
-        host=host,
-        token=token,
-        file_or_folder=file_or_folder,
-        delete_after_upload=delete,
-        parent_uuid=target_uuid
-    )
+
+    try:
+        upload_file_or_folder(
+            host=host,
+            token=token,
+            file_or_folder=Path(file_or_folder),
+            parent_id=target_id,
+        )
+    except Exception as ex:
+        console.print(ex)
 
 
 @click.command(name="list")
-@click.option(
-    '--parent-uuid',
-    help='Parent folder UUID'
-)
-@click.option(
-    '--inbox',
-    help='List nodes from Inbox folder',
-    is_flag=True
-)
-@click.option(
-    '--page-number',
-    help='Page number to list',
-    default=1
-)
-@click.option(
-    '--page-size',
-    help='Page size',
-    default=15
-)
+@click.option('--parent-id', help='Parent folder UUID')
+@click.option('--inbox', help='List nodes from Inbox folder', is_flag=True)
+@click.option('--page-number', help='Page number to list', default=1)
+@click.option('--page-size', help='Page size', default=15)
 @click.pass_context
-def _list(ctx, parent_uuid, inbox, page_number, page_size):
+def _list(ctx, parent_id, inbox, page_number, page_size):
     """Lists documents and folders of the given node
 
     If in case no specific node is requested - will list content
@@ -120,7 +109,7 @@ def _list(ctx, parent_uuid, inbox, page_number, page_size):
         host=host,
         token=token,
         inbox=inbox,
-        parent_uuid=parent_uuid,
+        parent_id=parent_id,
         page_number=page_number,
         page_size=page_size
     )
@@ -137,13 +126,15 @@ def current_user(
     """Show details of current user"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
-    user: User = perform_me(
-        host=host,
-        token=token,
-    )
-    output = format_users.current_user(user)
-
-    console.print(output)
+    try:
+        user: User = perform_me(
+            host=host,
+            token=token,
+        )
+        output = format_users.current_user(user)
+        console.print(output)
+    except Exception as ex:
+        console.print(ex)
 
 
 @click.command
@@ -151,10 +142,7 @@ def current_user(
     '--section',
     help='Limit output to preferences from this section only',
 )
-@click.option(
-    '--name',
-    help='Limit output to preferences with this only',
-)
+@click.option('--name', help='Limit output to preferences with this only')
 @click.pass_context
 def pref_list(
     ctx,
@@ -174,14 +162,8 @@ def pref_list(
 
 @click.command
 @click.pass_context
-@click.option(
-    '--section',
-    help='Section name of the preference to update',
-)
-@click.option(
-    '--name',
-    help='Name of the preference to update',
-)
+@click.option('--section', help='Section name of the preference to update')
+@click.option('--name', help='Name of the preference to update')
 @click.option(
     '--value',
     help='New value for the preference specified by section and name',
@@ -206,21 +188,11 @@ def pref_update(
 
 @click.command
 @click.pass_context
+@click.option('-q', '--query', help='Text to search for')
+@click.option('-t', '--tags', help='Comma separated list of tags')
 @click.option(
-    '-q',
-    '--query',
-    help='Text to search for',
-)
-@click.option(
-    '-t',
-    '--tags',
-    help='Comma separated list of tags',
-)
-@click.option(
-    '--tags-op',
+    '--tags-op', type=click.Choice(['all', 'any']), default='all',
     help='Should node contain all or any of the provided tags?',
-    type=click.Choice(['all', 'any']),
-    default='all',
     show_default=True
 )
 def search(
@@ -244,24 +216,17 @@ def search(
 @click.command
 @click.pass_context
 @click.option(
-    '-u',
-    '--uuid',
+    '-u', '--uuid', type=click.UUID, multiple=True,
     help='UUID of the node to download. You can use this option multiple times',
-    type=click.UUID,
-    multiple=True
 )
 @click.option(
-    '-f',
-    '--file-name',
+    '-f', '--file-name',
     help='Name of the file where to save downloaded document/folder',
 )
 @click.option(
-    '-t',
-    '--archive-type',
+    '-t', '--archive-type', type=click.Choice(['zip', 'targz']),
+    default='zip', show_default=True,
     help='Download node as tar.gz or as .zip',
-    type=click.Choice(['zip', 'targz']),
-    default='zip',
-    show_default=True
 )
 def download(
     ctx,

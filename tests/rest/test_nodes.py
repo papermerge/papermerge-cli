@@ -1,6 +1,6 @@
 from laconiq import make
 
-from papermerge_cli.rest.nodes import list_nodes
+from papermerge_cli.lib.nodes import list_nodes
 from papermerge_cli.schema import Node, Paginator, User
 
 
@@ -47,7 +47,7 @@ def test_list_nodes_returns_only_folders(requests_mock):
     data: Paginator[Node] = list_nodes(
         host="http://test",
         token="abc",
-        parent_uuid=home_id
+        parent_id=home_id
     )
 
     actual_titles = set([node.title for node in data.items])
@@ -98,7 +98,7 @@ def test_list_nodes_returns_one_ocred_document(requests_mock):
     data: Paginator[Node] = list_nodes(
         host="http://test",
         token="abc",
-        parent_uuid=home_id
+        parent_id=home_id
     )
 
     assert data.page_number == 1

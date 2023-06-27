@@ -1,41 +1,52 @@
-from papermerge_cli.fetch import get_me, get_nodes
-from papermerge_cli.schema import Node, Paginator, User
+from uuid import UUID
+
+from papermerge_cli.api_client import ApiClient
+from papermerge_cli.schema import CreateFolder, Folder, Node, Paginator
+from papermerge_cli.utils import catch_401, host_required, token_required
 
 
-def list_nodes(
+@catch_401
+@host_required
+@token_required
+def get_nodes(
+    node_id: str,
     host: str,
     token: str,
-    inbox: bool = False,
-    parent_uuid: str | None = None,
-    page_number: int = 1,
-    page_size: int = 15
+    query_params
 ) -> Paginator[Node]:
+    """Returns children nodes of the parent node specified by `node_id`"""
 
-    user: User = get_me(host=host, token=token)
-
-    if parent_uuid is None:
-        # in case no specific parent uuid is requested
-        # will list the content of user home's folder
-        if inbox is True:
-            # however, if flag `--inbox` is provided, will
-            # list content of user's inbox folder
-            node_id = str(user.inbox_folder_id)
-        else:
-            node_id = str(user.home_folder_id)
-    else:
-        node_id = parent_uuid
-
-    query_params = {
-        'page_number': page_number,
-        'per_page': page_size
-    }
-
-    data: Paginator[Node] = get_nodes(
-        node_id=node_id,
-        host=host,
-        token=token,
+    api_client = ApiClient[Paginator[Node]](token=token, host=host)
+    paginator = api_client.get(
+        f'/api/nodes/{node_id}',
+        response_model=Paginator[Node],
         query_params=query_params
-
     )
 
-    return data
+    return paginator
+
+
+def create_folder(
+    host: str,
+    token: str,
+    title: str,
+    parent_id: UUID
+) -> Folder:
+    api_client = ApiClient[Folder](token=token, host=host)
+
+    folder_to_create = CreateFolder(
+        title=title,
+        parent_id=parent_id
+    )
+
+    response_folder: Folder = api_client.post(
+        '/api/nodes/',
+        response_model=Folder,
+        json=folder_to_create.json()
+    )
+
+    return response_folder
+
+
+def create_document():
+    pass
