@@ -1,9 +1,11 @@
-import os
+import uuid
 from pathlib import Path
 
 import click
 import pkg_resources
+import typer
 from rich.console import Console
+from typing_extensions import Annotated
 
 import papermerge_cli.format.nodes as format_nodes
 import papermerge_cli.format.users as format_users
@@ -12,35 +14,54 @@ from papermerge_cli.lib.nodes import list_nodes
 from papermerge_cli.lib.users import me as perform_me
 from papermerge_cli.schema import Node, Paginator, User
 
-from .depricated_rest import (perform_download, perform_pref_list,
-                              perform_pref_update, perform_search)
 from .utils import sanitize_host
-
-console = Console()
 
 PREFIX = 'PAPERMERGE_CLI'
 
+console = Console()
+app = typer.Typer()
 
-@click.group(invoke_without_command=True)
-@click.pass_context
-@click.option(
-    '--host',
-    envvar=f'{PREFIX}__HOST',
-    help='URL to REST API host. It ends with slash and it includes protocol'
-    'scheme as well. For example: http://localhost:8000/'
-)
-@click.option(
-    '-t', '--token',
-    default=lambda: os.environ.get('TOKEN', None),
-    envvar=f'{PREFIX}__TOKEN',
-    help='JWT authorization token.'
-)
-@click.option(
-    '--version',
-    help='Show version of the papermerge-cli',
-    is_flag=True
-)
-def cli(ctx, host, token, version):
+
+ParentFolderID = Annotated[
+    uuid.UUID,
+    typer.Option(help='Parent folder UUID')
+]
+InboxFlag = Annotated[
+    bool,
+    typer.Option(is_flag=True, help='List nodes from Inbox folder')
+]
+PageSize = Annotated[
+    int,
+    typer.Option(min=1, max=1000, help='Results list page size')
+]
+PageNumber = Annotated[
+    int,
+    typer.Option(min=1, max=10000, help='Results list page number')
+]
+FileOrFolderPath = Annotated[Path, typer.Argument(exists=True)]
+DeleteAfterImport = Annotated[
+    bool,
+    typer.Option(
+        is_flag=True,
+        help='Delete local(s) file after successful upload.'
+    )
+]
+TargetNodeID = Annotated[
+    uuid.UUID,
+    typer.Option(
+        help="UUID of the target/destination folder. "
+             "Default value is user's Inbox folder's UUID."
+    )
+]
+
+
+@app.callback(invoke_without_command=True)
+def main(
+    ctx: typer.Context,
+    host: Annotated[str, typer.Option(envvar=f"{PREFIX}__HOST")],
+    token: Annotated[str, typer.Option(envvar=f"{PREFIX}__TOKEN")],
+    version: Annotated[bool, typer.Option(is_flag=True)] = True
+):
     if ctx.invoked_subcommand is None:
         # invoked without sub-command i.e. display version
         if version:
@@ -55,27 +76,17 @@ def cli(ctx, host, token, version):
         ctx.obj['TOKEN'] = token
 
 
-@click.command(name="import")
-@click.argument('file_or_folder', type=click.Path(exists=True))
-@click.option(
-    '--delete',
-    is_flag=True,
-    help='Delete local(s) file after successful upload.',
-)
-@click.option(
-    '--target-id',
-    help="UUID of the target/destination folder. "
-         "Default value is user's Inbox folder's UUID.",
-)
-@click.pass_context
-def _import(ctx, file_or_folder, delete, target_id):
-    """Import recursively documents from local folder
+@app.command(name="import")
+def _import(
+    ctx,
+    file_or_folder: FileOrFolderPath,
+    delete: DeleteAfterImport,
+    target_id: TargetNodeID
+):
+    """Import recursively folders and documents from local storage
 
-    If target UUID (--target-uuid) is not provided, target node UUID
-    defaults to the user's inbox folder UUID. In other words, import will
-    upload all documents to the user's inbox - if you want to change that, you
-    need to provide UUID of the folder where you want to upload
-    documents to.
+    If target UUID is not provided import will upload all documents to
+    the user's inbox
     """
     host = ctx.obj['HOST']
     token = ctx.obj['TOKEN']
@@ -91,17 +102,18 @@ def _import(ctx, file_or_folder, delete, target_id):
         console.print(ex)
 
 
-@click.command(name="list")
-@click.option('--parent-id', help='Parent folder UUID')
-@click.option('--inbox', help='List nodes from Inbox folder', is_flag=True)
-@click.option('--page-number', help='Page number to list', default=1)
-@click.option('--page-size', help='Page size', default=15)
-@click.pass_context
-def _list(ctx, parent_id, inbox, page_number, page_size):
+@app.command(name="list")
+def _list(
+    ctx: typer.Context,
+    parent_id: ParentFolderID | None = None,
+    inbox: InboxFlag = False,
+    page_number: PageNumber = 1,
+    page_size: PageSize = 15
+):
     """Lists documents and folders of the given node
 
     If in case no specific node is requested - will list content
-    of the user's home folder.
+    of the user's home folder
     """
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
@@ -118,11 +130,8 @@ def _list(ctx, parent_id, inbox, page_number, page_size):
     console.print(output)
 
 
-@click.command(name="me")
-@click.pass_context
-def current_user(
-    ctx
-):
+@app.command(name="me")
+def current_user(ctx: typer.Context):
     """Show details of current user"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
@@ -137,6 +146,7 @@ def current_user(
         console.print(ex)
 
 
+"""
 @click.command
 @click.option(
     '--section',
@@ -149,7 +159,6 @@ def pref_list(
     section,
     name
 ):
-    """List preferences"""
     token = ctx.obj.get('TOKEN', None)
     host = ctx.obj.get('HOST', None)
     perform_pref_list(
@@ -158,8 +167,9 @@ def pref_list(
         section=section,
         name=name
     )
+"""
 
-
+"""
 @click.command
 @click.pass_context
 @click.option('--section', help='Section name of the preference to update')
@@ -174,7 +184,6 @@ def pref_update(
     name,
     value
 ):
-    """List preferences"""
     token = ctx.obj.get('TOKEN', None)
     host = ctx.obj.get('HOST', None)
     perform_pref_update(
@@ -184,8 +193,9 @@ def pref_update(
         name=name,
         value=value
     )
+"""
 
-
+"""
 @click.command
 @click.pass_context
 @click.option('-q', '--query', help='Text to search for')
@@ -201,7 +211,6 @@ def search(
     tags,
     tags_op
 ):
-    """Search for document or folder containing given text"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
     perform_search(
@@ -211,8 +220,10 @@ def search(
         tags=tags,
         tags_op=tags_op
     )
+"""
 
 
+"""
 @click.command
 @click.pass_context
 @click.option(
@@ -234,7 +245,6 @@ def download(
     file_name: str,
     archive_type: str
 ):
-    """Download one or multiple nodes"""
     token = ctx.obj['TOKEN']
     host = ctx.obj['HOST']
     perform_download(
@@ -253,3 +263,4 @@ cli.add_command(pref_list)
 cli.add_command(pref_update)
 cli.add_command(search)
 cli.add_command(download)
+"""
