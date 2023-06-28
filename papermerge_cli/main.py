@@ -116,17 +116,17 @@ def main(
             )
             click.echo(papermerge_cli_version)
         else:
-            _list(ctx)
+            list_nodes_command(ctx)
 
 
 @app.command(name="import")
-def _import(
+def import_command(
     ctx: typer.Context,
     file_or_folder: FileOrFolderPath,
     delete: DeleteAfterImport = False,
     target_id: TargetNodeID | None = None
 ):
-    """Import recursively folders and documents from local storage
+    """Import recursively folders and documents from local filesystem
 
     If target UUID is not provided import will upload all documents to
     the user's inbox
@@ -143,7 +143,7 @@ def _import(
 
 
 @app.command(name="ls")
-def _list(
+def list_nodes_command(
     ctx: typer.Context,
     parent_id: ParentFolderID | None = None,
     inbox: InboxFlag = False,
@@ -151,7 +151,7 @@ def _list(
     page_size: PageSize = 15,
     order_by: OrderBy = '-title'
 ):
-    """Lists documents and folders of the given node
+    """Lists documents and folders from your papermerge account
 
     If in case no specific node is requested - will list content
     of the user's home folder
@@ -174,7 +174,7 @@ def _list(
 
 
 @app.command(name="me")
-def current_user(ctx: typer.Context):
+def current_user_command(ctx: typer.Context):
     """Show details of current user"""
     try:
         user: User = perform_me(
