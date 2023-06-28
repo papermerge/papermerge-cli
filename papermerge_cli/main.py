@@ -142,7 +142,7 @@ def _import(
         console.print(ex)
 
 
-@app.command(name="list")
+@app.command(name="ls")
 def _list(
     ctx: typer.Context,
     parent_id: ParentFolderID | None = None,
