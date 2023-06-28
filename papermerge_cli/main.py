@@ -47,11 +47,19 @@ InboxFlag = Annotated[
 ]
 PageSize = Annotated[
     int,
-    typer.Option(min=1, max=1000, help='Results list page size')
+    typer.Option(
+        min=1,
+        max=1000,
+        help='Results items will be listed on a single page'
+    )
 ]
 PageNumber = Annotated[
     int,
-    typer.Option(min=1, max=10000, help='Results list page number')
+    typer.Option(
+        min=1,
+        max=10000,
+        help='Results list page number'
+    )
 ]
 FileOrFolderPath = Annotated[
     Path,
@@ -75,6 +83,15 @@ TargetNodeID = Annotated[
     typer.Option(
         help="UUID of the target/destination folder. "
              "Default value is user's Inbox folder's UUID."
+    )
+]
+OrderBy = Annotated[
+    str,
+    typer.Option(
+        help="Ordering criteria. Valid fields are title, ctype, created_at, "
+        "updated_at. Fields can be preceeded by '-' to express reverse order."
+        "For example order_by=-title, will sort restuls by title in "
+        "descendant order"
     )
 ]
 
@@ -131,7 +148,8 @@ def _list(
     parent_id: ParentFolderID | None = None,
     inbox: InboxFlag = False,
     page_number: PageNumber = 1,
-    page_size: PageSize = 15
+    page_size: PageSize = 15,
+    order_by: OrderBy = '-title'
 ):
     """Lists documents and folders of the given node
 
@@ -144,7 +162,8 @@ def _list(
         inbox=inbox,
         parent_id=parent_id,
         page_number=page_number,
-        page_size=page_size
+        page_size=page_size,
+        order_by=order_by
     )
 
     output: Table = format_nodes.list_nodes(data)

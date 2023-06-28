@@ -10,7 +10,8 @@ def list_nodes(
     inbox: bool = False,
     parent_id: uuid.UUID | None = None,
     page_number: int = 1,
-    page_size: int = 15
+    page_size: int = 15,
+    order_by: str = '-title'
 ) -> Paginator[Node]:
 
     user: User = get_me(host=host, token=token)
@@ -29,7 +30,8 @@ def list_nodes(
 
     query_params = {
         'page_number': page_number,
-        'per_page': page_size
+        'page_size': page_size,
+        'order_by': order_by
     }
 
     data: Paginator[Node] = get_nodes(
