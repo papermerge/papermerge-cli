@@ -23,7 +23,7 @@ def test_list_nodes_returns_only_folders(requests_mock):
     )
 
     # URL to above-mentioned user's home folder
-    params = 'page_number=1&per_page=15'
+    params = 'page_number=1&page_size=15'
     home_id = 'a82cbe8e-fa0e-4aec-8950-7fcbeaef186c'
     nodes_url = f'http://test/api/nodes/{home_id}?{params}'
 
@@ -72,7 +72,7 @@ def test_list_nodes_returns_one_ocred_document(requests_mock):
     )
 
     # URL to above-mentioned user's home folder
-    params = 'page_number=1&per_page=15'
+    params = 'page_number=1&page_size=15'
     home_id = user.home_folder_id
     nodes_url = f'http://test/api/nodes/{home_id}?{params}'
 
