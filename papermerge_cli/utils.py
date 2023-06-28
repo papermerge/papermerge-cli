@@ -1,4 +1,3 @@
-from papermerge_restapi_client.exceptions import ApiException
 from rich.console import Console
 
 console = Console()
@@ -54,23 +53,5 @@ def host_required(func):
             )
             return
         return func(**kwargs)
-
-    return inner
-
-
-def catch_401(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except ApiException as e:
-            if e.status == 401:
-                console.print("Unable to authenticate", style="red")
-                console.print(
-                    "Did you set [b]PAPERMERGE_CLI__HOST[/b]"
-                    " and [b]PAPERMERGE_CLI__TOKEN[/b] environment variables"
-                    " correctly?"
-                )
-                return
-            raise ApiException from e
 
     return inner

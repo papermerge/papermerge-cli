@@ -2,10 +2,9 @@ from uuid import UUID
 
 from papermerge_cli.api_client import ApiClient
 from papermerge_cli.schema import CreateFolder, Folder, Node, Paginator
-from papermerge_cli.utils import catch_401, host_required, token_required
+from papermerge_cli.utils import host_required, token_required
 
 
-@catch_401
 @host_required
 @token_required
 def get_nodes(

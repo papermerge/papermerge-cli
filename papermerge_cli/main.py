@@ -47,11 +47,19 @@ InboxFlag = Annotated[
 ]
 PageSize = Annotated[
     int,
-    typer.Option(min=1, max=1000, help='Results list page size')
+    typer.Option(
+        min=1,
+        max=1000,
+        help='Results items will be listed on a single page'
+    )
 ]
 PageNumber = Annotated[
     int,
-    typer.Option(min=1, max=10000, help='Results list page number')
+    typer.Option(
+        min=1,
+        max=10000,
+        help='Results list page number'
+    )
 ]
 FileOrFolderPath = Annotated[
     Path,
@@ -77,6 +85,15 @@ TargetNodeID = Annotated[
              "Default value is user's Inbox folder's UUID."
     )
 ]
+OrderBy = Annotated[
+    str,
+    typer.Option(
+        help="Ordering criteria. Valid fields are title, ctype, created_at, "
+        "updated_at. Fields can be preceeded by '-' to express reverse order."
+        "For example order_by=-title, will sort restuls by title in "
+        "descendant order"
+    )
+]
 
 
 @app.callback(invoke_without_command=True)
@@ -99,17 +116,17 @@ def main(
             )
             click.echo(papermerge_cli_version)
         else:
-            _list(ctx)
+            list_nodes_command(ctx)
 
 
 @app.command(name="import")
-def _import(
+def import_command(
     ctx: typer.Context,
     file_or_folder: FileOrFolderPath,
     delete: DeleteAfterImport = False,
     target_id: TargetNodeID | None = None
 ):
-    """Import recursively folders and documents from local storage
+    """Import recursively folders and documents from local filesystem
 
     If target UUID is not provided import will upload all documents to
     the user's inbox
@@ -125,15 +142,16 @@ def _import(
         console.print(ex)
 
 
-@app.command(name="list")
-def _list(
+@app.command(name="ls")
+def list_nodes_command(
     ctx: typer.Context,
     parent_id: ParentFolderID | None = None,
     inbox: InboxFlag = False,
     page_number: PageNumber = 1,
-    page_size: PageSize = 15
+    page_size: PageSize = 15,
+    order_by: OrderBy = '-title'
 ):
-    """Lists documents and folders of the given node
+    """Lists documents and folders from your papermerge account
 
     If in case no specific node is requested - will list content
     of the user's home folder
@@ -144,7 +162,8 @@ def _list(
         inbox=inbox,
         parent_id=parent_id,
         page_number=page_number,
-        page_size=page_size
+        page_size=page_size,
+        order_by=order_by
     )
 
     output: Table = format_nodes.list_nodes(data)
@@ -155,7 +174,7 @@ def _list(
 
 
 @app.command(name="me")
-def current_user(ctx: typer.Context):
+def current_user_command(ctx: typer.Context):
     """Show details of current user"""
     try:
         user: User = perform_me(
