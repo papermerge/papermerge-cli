@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 
 from papermerge_cli.api_client import ApiClient
@@ -23,6 +24,55 @@ def get_nodes(
     )
 
     return paginator
+
+
+def node_assign_tags(
+    node_id: UUID,
+    host: str,
+    token: str,
+    tags: List[str]
+):
+    """Assigns list of tags to the node
+
+    Assignment operation will replace all current tags with the
+    new ones.
+    """
+    api_client = ApiClient(token=token, host=host)
+    api_client.post(
+        f'/api/nodes/{node_id}/tags',
+        json=tags
+    )
+
+
+def node_add_tags(
+    node_id: UUID,
+    host: str,
+    token: str,
+    tags: List[str]
+):
+    """Add list of tags to the node
+
+    Add operation will append new tags to the current one.
+    """
+    api_client = ApiClient(token=token, host=host)
+    api_client.patch(
+        f'/api/nodes/{node_id}/tags',
+        json=tags
+    )
+
+
+def node_remove_tags(
+    node_id: UUID,
+    host: str,
+    token: str,
+    tags: List[str]
+):
+    """Remove list of tags from the node"""
+    api_client = ApiClient(token=token, host=host)
+    api_client.delete(
+        f'/api/nodes/{node_id}/tags',
+        json=tags
+    )
 
 
 def create_folder(

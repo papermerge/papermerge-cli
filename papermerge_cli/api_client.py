@@ -32,18 +32,48 @@ class ApiClient(Generic[T]):
         self,
         url,
         json,
-        response_model
+        response_model=None
     ):
         response = requests.post(
             f"{self.host}{url}",
             headers=self.headers,
-            data=json
+            json=json
         )
 
-        if response.status_code != 201:
+        if response.status_code not in (200, 201):
             raise ValueError(response.text)
 
-        return response_model(**response.json())
+        if response_model:
+            return response_model(**response.json())
+
+    def patch(
+        self,
+        url,
+        json,
+        response_model=None
+    ):
+        response = requests.patch(
+            f"{self.host}{url}",
+            headers=self.headers,
+            json=json
+        )
+
+        if response.status_code not in (200, 201):
+            raise ValueError(response.text)
+
+        if response_model:
+            return response_model(**response.json())
+
+    def delete(
+        self,
+        url,
+        json,
+    ):
+        requests.delete(
+            f"{self.host}{url}",
+            headers=self.headers,
+            json=json
+        )
 
     def upload(
         self,

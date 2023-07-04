@@ -1,7 +1,10 @@
 import uuid
+from typing import List
 
-from papermerge_cli.rest import get_me, get_nodes
+from papermerge_cli.rest import (get_me, get_nodes, node_add_tags,
+                                 node_assign_tags, node_remove_tags)
 from papermerge_cli.schema import Node, Paginator, User
+from papermerge_cli.types import NodeActionEnum
 
 
 def list_nodes(
@@ -43,3 +46,35 @@ def list_nodes(
     )
 
     return data
+
+
+def perform_node_command(
+    host: str,
+    token: str,
+    node_id: uuid.UUID,
+    action: NodeActionEnum,
+    tags: List[str]
+):
+    if action in (NodeActionEnum.assign_tags, NodeActionEnum.replace_tags):
+        node_assign_tags(
+            host=host,
+            token=token,
+            node_id=node_id,
+            tags=tags
+        )
+    elif action in (NodeActionEnum.add_tags, NodeActionEnum.append_tags):
+        node_add_tags(
+            host=host,
+            token=token,
+            node_id=node_id,
+            tags=tags
+        )
+    elif action in (NodeActionEnum.remove_tags, NodeActionEnum.delete_tags):
+        node_remove_tags(
+            host=host,
+            token=token,
+            node_id=node_id,
+            tags=tags
+        )
+    else:
+        raise ValueError("Invalid node action")

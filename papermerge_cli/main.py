@@ -1,6 +1,7 @@
 import importlib.metadata
 import uuid
 from pathlib import Path
+from typing import List
 
 import click
 import typer
@@ -11,9 +12,10 @@ from typing_extensions import Annotated
 import papermerge_cli.format.nodes as format_nodes
 import papermerge_cli.format.users as format_users
 from papermerge_cli.lib.importer import upload_file_or_folder
-from papermerge_cli.lib.nodes import list_nodes
+from papermerge_cli.lib.nodes import list_nodes, perform_node_command
 from papermerge_cli.lib.users import me as perform_me
 from papermerge_cli.schema import Node, Paginator, User
+from papermerge_cli.types import NodeActionEnum
 
 from .utils import sanitize_host
 
@@ -21,6 +23,7 @@ PREFIX = 'PAPERMERGE_CLI'
 
 console = Console()
 app = typer.Typer()
+
 
 HostEnvVar = Annotated[
     str,
@@ -36,6 +39,16 @@ TokenEnvVar = Annotated[
         envvar=f"{PREFIX}__TOKEN",
         help='JWT authorization token'
     ),
+]
+NodeAction = Annotated[
+    NodeActionEnum,
+    typer.Argument(
+        help='add/removes/assign tags to the node'
+    )
+]
+NodeID = Annotated[
+    uuid.UUID,
+    typer.Option(help='Node UUID')
 ]
 ParentFolderID = Annotated[
     uuid.UUID,
@@ -185,6 +198,23 @@ def current_user_command(ctx: typer.Context):
         console.print(output)
     except Exception as ex:
         console.print(ex)
+
+
+@app.command(name="node")
+def node_command(
+    ctx: typer.Context,
+    node_id: NodeID,
+    action: NodeAction,
+    tags: List[str]
+):
+    """Perform actions on specific node"""
+    perform_node_command(
+        host=ctx.obj['HOST'],
+        token=ctx.obj['TOKEN'],
+        node_id=node_id,
+        action=action,
+        tags=tags
+    )
 
 
 """
