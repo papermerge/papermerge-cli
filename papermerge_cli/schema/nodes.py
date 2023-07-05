@@ -30,10 +30,17 @@ class DocumentNode(BaseModel):
     ocr_status: OCRStatusEnum = OCRStatusEnum.unknown
 
 
+class Tag(BaseModel):
+    name: str
+    bg_color: str
+    fg_color: str
+
+
 class Node(BaseModel):
     id: UUID
     title: str
     ctype: NodeType
+    tags: List[Tag]
     created_at: datetime
     updated_at: datetime
     parent_id: UUID | None

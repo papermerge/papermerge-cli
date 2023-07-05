@@ -10,12 +10,14 @@ def list_nodes(data: Paginator[Node]) -> Table:
     table.add_column("Type")
     table.add_column("Title")
     table.add_column("UUID", no_wrap=True)
+    table.add_column("Tags")
 
     for node in data.items:
         table.add_row(
             node.ctype,
             node.title,
-            str(node.id)
+            str(node.id),
+            ','.join(sorted(tag.name for tag in node.tags))
         )
 
     return table
