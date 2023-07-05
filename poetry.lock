@@ -319,13 +319,13 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "laconiq"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "laconiq-0.1.0-py3-none-any.whl", hash = "sha256:87a9ab1deb8e003a2439d39e7c5d9399028aad562a2b7b09b76ef945bbadd11c"},
-    {file = "laconiq-0.1.0.tar.gz", hash = "sha256:db4d658367aafd65f23dae1fbd525433b9362e2df9f792c563ee5e16d2596a43"},
+    {file = "laconiq-0.2.0-py3-none-any.whl", hash = "sha256:53f444271290e4cba718847b880daa85fe3c7f9b5a16da30dc9447bc333e7826"},
+    {file = "laconiq-0.2.0.tar.gz", hash = "sha256:42c788865e2f632788b74b95186cc460be92739e425b7bed5c1c7c710c8b58d2"},
 ]
 
 [package.dependencies]
@@ -852,4 +852,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e6c0afb7f3171c713ff9df55aa094f864fb9303d07c6d9dcb94049df30f9ed0d"
+content-hash = "0614005734fb70006be090d8d2b24d14559aac9ee5a795e76560ac236448590b"
