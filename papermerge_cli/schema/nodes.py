@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ValidationError, validator
+from pydantic import BaseModel, ValidationError, field_validator
 
 from papermerge_cli.types import OCRStatusEnum
 
@@ -17,7 +17,7 @@ class UpdateNode(BaseModel):
     title: Optional[str]
     parent_id: Optional[UUID]
 
-    @validator('parent_id')
+    @field_validator('parent_id')
     def parent_id_is_not_none(cls, value):
         if value is None:
             raise ValidationError('Cannot set parent_id to None')
@@ -43,13 +43,13 @@ class Node(BaseModel):
     tags: List[Tag]
     created_at: datetime
     updated_at: datetime
-    parent_id: UUID | None
+    parent_id: UUID | None = None
     user_id: UUID
     document: DocumentNode | None = None
 
-    @validator('document', pre=True)
+    @field_validator('document', mode='before')
     def document_validator(cls, value, values):
-        if values['ctype'] == NodeType.document:
+        if values.data['ctype'] == NodeType.document:
             return DocumentNode(
                 ocr_status=value['ocr_status'],
                 ocr=value['ocr']
