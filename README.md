@@ -26,7 +26,7 @@ interpreter. In order to install `pip` on Ubuntu use following command:
 REST API column - is version of Papermerge REST API server. This value
 you can get from:
 
-    $ papermerge-cli --server-version
+    $ papermerge-cli server-version
 
 CLI column - is version of papermege-cli command line utility. This value
 you can get from:
