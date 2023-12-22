@@ -1,37 +1,18 @@
-name: Version Bump
+name: Generate changelog and publish pacakge to pypi
 
 on:
-  workflow_dispatch:
-    inputs:
-      incremented_part:
-        type: choice
-        description: Incremented Part
-        default: 'micro'
-        options:
-          - major
-          - minor
-          - micro
-      publish-to-pypi:
-        description: 'Publish to PyPi'
-        type: boolean
-        required: true
-        default: true
+  push:
+    tags:
+      - '*'
 
 jobs:
-  version-bump:
+  generate-changelog:
     runs-on: ubuntu-latest
     outputs:
       old-version: ${{ steps.step-version-bump.outputs.OLD_VERSION }}
       new-version: ${{ steps.step-version-bump.outputs.NEW_VERSION }}
     steps:
       - uses: actions/checkout@master
-
-      - name: Version bump
-        id: step-version-bump
-        uses: papermerge/banger@master
-        with:
-          files_list: "pyproject.toml"
-          incremented_part: ${{ inputs.incremented_part }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
@@ -43,13 +24,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install towncrier
           # will remove files from changelog.d/ and update changelog.md file
-          towncrier build --version ${{steps.step-version-bump.outputs.NEW_VERSION}} --yes
+          towncrier build --version ${{ github.ref_name }} --yes
 
       - name: Commit files
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "version bump ${{steps.step-version-bump.outputs.OLD_VERSION}} -> ${{steps.step-version-bump.outputs.NEW_VERSION}}" -a
+          git commit -m "changelog for ${{ github.ref_name }}" -a
 
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -59,8 +40,7 @@ jobs:
 
   publish-to-pypi:
     name: Publish to Pypi
-    needs: [ "version-bump" ]
+    needs: [ "generate-changelog" ]
     uses: papermerge/papermerge-core/.github/workflows/publish-to-pypi.yml@master
-    if: ${{ github.event.inputs.publish-to-pypi == 'true' }}
     secrets:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
