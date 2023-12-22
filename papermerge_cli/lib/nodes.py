@@ -1,8 +1,7 @@
 import uuid
 from typing import List
 
-from papermerge_cli.rest import (get_me, get_nodes, node_add_tags,
-                                 node_assign_tags, node_remove_tags)
+from papermerge_cli import rest
 from papermerge_cli.schema import Node, Paginator, User
 from papermerge_cli.types import NodeActionEnum
 
@@ -17,7 +16,7 @@ def list_nodes(
     order_by: str = '-title'
 ) -> Paginator[Node]:
 
-    user: User = get_me(host=host, token=token)
+    user: User = rest.get_me(host=host, token=token)
 
     if parent_id is None:
         # in case no specific parent uuid is requested
@@ -37,7 +36,7 @@ def list_nodes(
         'order_by': order_by
     }
 
-    data: Paginator[Node] = get_nodes(
+    data: Paginator[Node] = rest.get_nodes(
         node_id=node_id,
         host=host,
         token=token,
@@ -56,21 +55,21 @@ def perform_node_command(
     tags: List[str]
 ):
     if action in (NodeActionEnum.assign_tags, NodeActionEnum.replace_tags):
-        node_assign_tags(
+        rest.node_assign_tags(
             host=host,
             token=token,
             node_id=node_id,
             tags=tags
         )
     elif action in (NodeActionEnum.add_tags, NodeActionEnum.append_tags):
-        node_add_tags(
+        rest.node_add_tags(
             host=host,
             token=token,
             node_id=node_id,
             tags=tags
         )
     elif action in (NodeActionEnum.remove_tags, NodeActionEnum.delete_tags):
-        node_remove_tags(
+        rest.node_remove_tags(
             host=host,
             token=token,
             node_id=node_id,
