@@ -91,7 +91,7 @@ def create_folder(
     response_folder: Folder = api_client.post(
         '/api/nodes/',
         response_model=Folder,
-        json=folder_to_create.model_dump()
+        json=folder_to_create.model_dump(mode='json')
     )
 
     return response_folder
