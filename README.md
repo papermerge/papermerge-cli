@@ -20,6 +20,25 @@ interpreter. In order to install `pip` on Ubuntu use following command:
 
     $ sudo apt install python3-pip
 
+
+## REST API/CLI Version Compatibility
+
+REST API column - is version of Papermerge REST API server. This value
+you can get from:
+
+    $ papermerge-cli server-version
+
+CLI column - is version of papermege-cli command line utility. This value
+you can get from:
+
+    $ papermerge-cli --version
+
+
+| REST API | CLI  |
+|----------|------|
+| =3.0     | =0.7 |
+| =2.1     | = 0.3.3|
+
 ## Usage
 
 Get you REST API authentication token from your instance:

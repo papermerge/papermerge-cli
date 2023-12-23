@@ -9,6 +9,12 @@ can be found in [changelog.d folder](https://github.com/papermerge/papermerge-cl
 
 <!-- towncrier release notes start -->
 
+## 0.7.0 - 2023-12-22
+
+- pydantic dependency upgraded from 1.x to v2.5
+- `import` command fixed to work with REST API version 3.0 (Papermerge DMS 3.0)
+- `server-version` command added (returns version of server REST API)
+
 ## 0.3.3 - 2022-12-24
 
 

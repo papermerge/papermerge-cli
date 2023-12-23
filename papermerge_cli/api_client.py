@@ -1,7 +1,10 @@
+from mimetypes import guess_type
 from pathlib import Path
 from typing import Generic, TypeVar
 
 import requests
+
+from papermerge_cli.exceptions import FileMimeTypeUnknown
 
 T = TypeVar('T')
 
@@ -34,9 +37,13 @@ class ApiClient(Generic[T]):
         json,
         response_model=None
     ):
+        headers = {
+            'Content-Type': 'application/json',
+            **self.headers
+        }
         response = requests.post(
             f"{self.host}{url}",
-            headers=self.headers,
+            headers=headers,
             json=json
         )
 
@@ -81,12 +88,23 @@ class ApiClient(Generic[T]):
         file_path: Path,
         response_model
     ) -> T:
+        mime_type, _ = guess_type(file_path)
+
+        if mime_type is None:
+            msg = f"{file_path} mime type cannot be guessed"
+            raise FileMimeTypeUnknown(msg)
+
         data = open(file_path, 'rb').read()
+        # https://stackoverflow.com/a/35974071/381116
+        multipart_form_data = {
+            'file': (file_path.name, data, mime_type),
+        }
         response = requests.post(
             f"{self.host}{url}",
             headers=self.headers,
-            files=dict(file=data)
+            files=multipart_form_data
         )
+
         if response.status_code != 200:
             raise ValueError(response.text)
 

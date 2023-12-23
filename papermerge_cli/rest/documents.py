@@ -22,7 +22,7 @@ def upload(
     response_doc: Document = api_client.post(
         '/api/nodes/',
         response_model=Document,
-        json=doc_to_create.json()
+        json=doc_to_create.model_dump(mode='json')
     )
 
     result_doc: Document = api_client.upload(

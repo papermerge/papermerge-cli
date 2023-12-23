@@ -1,0 +1,13 @@
+name: Publish pacakge to pypi
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish-to-pypi:
+    name: Publish to Pypi
+    uses: papermerge/papermerge-core/.github/workflows/publish-to-pypi.yml@master
+    secrets:
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

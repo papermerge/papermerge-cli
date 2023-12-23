@@ -14,6 +14,7 @@ import papermerge_cli.format.users as format_users
 from papermerge_cli.lib.importer import upload_file_or_folder
 from papermerge_cli.lib.nodes import list_nodes, perform_node_command
 from papermerge_cli.lib.users import me as perform_me
+from papermerge_cli.lib.version import perform_server_version_command
 from papermerge_cli.schema import Node, Paginator, User
 from papermerge_cli.types import NodeActionEnum
 
@@ -215,6 +216,17 @@ def node_command(
         action=action,
         tags=tags
     )
+
+
+@app.command(name="server-version")
+def server_version_command(ctx: typer.Context):
+    """Get REST API version used on server side"""
+    output = perform_server_version_command(
+        host=ctx.obj['HOST'],
+        token=ctx.obj['TOKEN'],
+    )
+
+    console.print(output)
 
 
 """
