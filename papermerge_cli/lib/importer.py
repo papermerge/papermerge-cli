@@ -27,7 +27,7 @@ def upload_file_or_folder(
             host=host,
             token=token,
             file_path=file_or_folder,
-            parent_id=parent_id,
+            parent_id=parent_id
         )
         if delete:
             remove(file_or_folder)
@@ -40,7 +40,7 @@ def upload_file_or_folder(
                 host=host,
                 token=token,
                 file_path=Path(entry.path),
-                parent_id=parent_id,
+                parent_id=parent_id
             )
 
             if delete:
