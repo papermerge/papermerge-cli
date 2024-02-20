@@ -61,6 +61,8 @@ def upload_file_or_folder(
                 file_or_folder=Path(entry.path),
                 delete=delete
             )
+            if delete:
+                remove(Path(entry.path))
 
 
 def remove(path: Path):
