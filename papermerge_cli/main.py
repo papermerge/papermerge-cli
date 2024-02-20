@@ -151,6 +151,7 @@ def import_command(
             token=ctx.obj['TOKEN'],
             file_or_folder=Path(file_or_folder),
             parent_id=target_id,
+            delete=delete
         )
     except Exception as ex:
         console.print(ex)
@@ -170,15 +171,19 @@ def list_nodes_command(
     If in case no specific node is requested - will list content
     of the user's home folder
     """
-    data: Paginator[Node] = list_nodes(
-        host=ctx.obj['HOST'],
-        token=ctx.obj['TOKEN'],
-        inbox=inbox,
-        parent_id=parent_id,
-        page_number=page_number,
-        page_size=page_size,
-        order_by=order_by
-    )
+    try:
+        data: Paginator[Node] = list_nodes(
+            host=ctx.obj['HOST'],
+            token=ctx.obj['TOKEN'],
+            inbox=inbox,
+            parent_id=parent_id,
+            page_number=page_number,
+            page_size=page_size,
+            order_by=order_by
+        )
+    except Exception as ex:
+        console.print(ex, style="red")
+        return
 
     output: Table = format_nodes.list_nodes(data)
     if len(output.rows):
