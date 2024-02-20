@@ -9,6 +9,13 @@ can be found in [changelog.d folder](https://github.com/papermerge/papermerge-cl
 
 <!-- towncrier release notes start -->
 
+## 0.7.1 - 2024-02-20
+
+### Fixed
+
+- papermerge-cli import option --delete without any function [Issue#592](https://github.com/ciur/papermerge/issues/592)
+
+
 ## 0.7.0 - 2023-12-22
 
 - pydantic dependency upgraded from 1.x to v2.5
