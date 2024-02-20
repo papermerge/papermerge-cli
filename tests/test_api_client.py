@@ -14,7 +14,7 @@ def test_fetch_user(requests_mock):
         email='john@mail.com',
         home_folder_id=UUID('a82cbe8e-fa0e-4aec-8950-7fcbeaef186c')
     )
-    requests_mock.get('http://test/api/users/me', text=user.json())
+    requests_mock.get('http://test/api/users/me', text=user.model_dump_json())
     got_user = api_client.get('/api/users/me', response_model=User)
 
     assert got_user.email == 'john@mail.com'

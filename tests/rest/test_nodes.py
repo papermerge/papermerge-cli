@@ -19,7 +19,7 @@ def test_list_nodes_returns_only_folders(requests_mock):
     user = make(User)
     requests_mock.get(
         user_me_url,
-        text=user.json()
+        text=user.model_dump_json()
     )
 
     # URL to above-mentioned user's home folder
@@ -40,7 +40,7 @@ def test_list_nodes_returns_only_folders(requests_mock):
         Paginator,
         page_number=1,
         items=folder_items
-    ).json()
+    ).model_dump_json()
 
     requests_mock.get(nodes_url, text=text_payload)
 
@@ -68,7 +68,7 @@ def test_list_nodes_returns_one_ocred_document(requests_mock):
 
     requests_mock.get(
         user_me_url,
-        text=user.json()
+        text=user.model_dump_json()
     )
 
     # URL to above-mentioned user's home folder
@@ -91,7 +91,7 @@ def test_list_nodes_returns_one_ocred_document(requests_mock):
         Paginator,
         page_number=1,
         items=[node]
-    ).json()
+    ).model_dump_json()
 
     requests_mock.get(nodes_url, text=text_payload)
 
