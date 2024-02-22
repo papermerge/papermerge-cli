@@ -13,6 +13,9 @@ class CreateDocument(BaseModel):
     parent_id: UUID | None
     lang: str | None = None
     file_name: str | None = None
+    # if true then OCR the document
+    # if false then skip OCR part
+    ocr: bool = True
 
 
 class Page(BaseModel):

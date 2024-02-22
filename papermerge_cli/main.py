@@ -92,11 +92,19 @@ DeleteAfterImport = Annotated[
         help='Delete local(s) file after successful upload.'
     )
 ]
+SkipOCR = Annotated[
+    bool,
+    typer.Option(
+        is_flag=True,
+        help='Skip OCR i.e. do not trigger OCR operation on upload.'
+             ' Works only with REST API >= 3.1'
+    )
+]
 TargetNodeID = Annotated[
     uuid.UUID,
     typer.Option(
-        help="UUID of the target/destination folder. "
-             "Default value is user's Inbox folder's UUID."
+        is_flag=True,
+        help="Trigger OCR"
     )
 ]
 OrderBy = Annotated[
@@ -138,6 +146,7 @@ def import_command(
     ctx: typer.Context,
     file_or_folder: FileOrFolderPath,
     delete: DeleteAfterImport = False,
+    skip_ocr: SkipOCR = False,
     target_id: TargetNodeID | None = None
 ):
     """Import recursively folders and documents from local filesystem
@@ -150,6 +159,7 @@ def import_command(
             host=ctx.obj['HOST'],
             token=ctx.obj['TOKEN'],
             file_or_folder=Path(file_or_folder),
+            skip_ocr=skip_ocr,
             parent_id=target_id,
             delete=delete
         )

@@ -9,14 +9,16 @@ def upload(
     host: str,
     token: str,
     file_path: Path,
-    parent_id: UUID
+    parent_id: UUID,
+    skip_ocr: bool = False,
 ) -> Document:
     api_client = ApiClient[Document](token=token, host=host)
 
     doc_to_create = CreateDocument(
         title=file_path.name,
         file_name=file_path.name,
-        parent_id=parent_id
+        parent_id=parent_id,
+        ocr=not skip_ocr
     )
 
     response_doc: Document = api_client.post(
