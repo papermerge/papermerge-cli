@@ -14,7 +14,8 @@ def upload_file_or_folder(
     token: str,
     file_or_folder: Path,
     parent_id=None,
-    delete: bool = False
+    delete: bool = False,
+    skip_ocr: bool = False,
 ) -> None:
     user: User = get_me(host=host, token=token)
 
@@ -27,6 +28,7 @@ def upload_file_or_folder(
             host=host,
             token=token,
             file_path=file_or_folder,
+            skip_ocr=skip_ocr,
             parent_id=parent_id
         )
         if delete:
@@ -40,6 +42,7 @@ def upload_file_or_folder(
                 host=host,
                 token=token,
                 file_path=Path(entry.path),
+                skip_ocr=skip_ocr,
                 parent_id=parent_id
             )
 

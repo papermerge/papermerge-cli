@@ -9,6 +9,12 @@ can be found in [changelog.d folder](https://github.com/papermerge/papermerge-cl
 
 <!-- towncrier release notes start -->
 
+## 0.8.0 - 2024-02-22
+
+## Added
+
+- `--skip-ocr` flag. Works only with Papermerge REST API >= 3.1
+
 ## 0.7.1 - 2024-02-20
 
 ### Fixed

@@ -116,6 +116,14 @@ successful import - add `--delete` flag:
 PLEASE BE CAREFUL WITH `--delete` FLAG AS IT WILL IRREVERSIBLE DELETE THE LOCAL
 COPY OF THE UPLOADED DOCUMENT!
 
+Choose to skip OCR of imported documents with `--skip-ocr` flag:
+
+    $ papermerge-cli import --skip-ocr /path/to/folder/
+
+Skip OCR flag can be used with folders (will apply to all docs in the folder)
+or with individual documents.
+`--skip-ocr` flag will work only with Papermerge REST API >= v3.1
+
 ### search
 
 Search for node (document or folder) by text or by tags:
@@ -169,3 +177,13 @@ or in case of uuid is a folder:
 You can also specify the format/type of the downloaded archive (e.g. in case node is either a folder):
 
      $ papermerge-cli download --uuid <folder-uuid>  -f /path/to/file-system/folder.targz -t targz
+
+
+## Version Compatiblity
+
+
+| CLI Version | REST API version | Remarks|
+|-------------|------------------|--------|
+| 0.7.0       | 3.0.x            ||
+| 0.7.1       | 3.0.x            ||
+| 0.8.0       | 3.1.x            | Skip OCR feature introduced|
